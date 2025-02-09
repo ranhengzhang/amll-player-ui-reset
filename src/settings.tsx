@@ -1,19 +1,145 @@
 import { atom, useAtom } from "jotai";
-import { useEffect, type FC } from "react";
+import {atomWithStorage} from "jotai/utils";
+import {useEffect, type FC, PropsWithChildren} from "react";
+import chalk from "chalk";
+import {TextProps, Text, Flex, Switch, Card} from "@radix-ui/themes";
 
-const testAtom = atom(0)
+const WARN_TAG = chalk.bgHex("#de2a18").hex("#FFFFFF")(" WARN ");
+const INFO_TAG = chalk.bgHex("#2376b7").hex("#FFFFFF")(" INFO ");
+const  LOG_TAG = chalk.bgHex("#1ba784").hex("#FFFFFF")(" LOG ");
+const NAME_TAG = chalk.bgHex("#737c7b").hex("#FFFFFF")(" UI ");
+
+function getChalk(bg: string, fg: string, part: string) {
+    return chalk.bgHex(bg).hex(fg)(` ${part} `);
+}
+
+export function consoleLog(type: string, part: string, info: string) {
+
+    const PART_TAG = getChalk("#61649f", "#FFFFFF", part);
+    if (type === "INFO") {
+        console.log(NAME_TAG + INFO_TAG + PART_TAG, info)
+
+    } else if (type === "WARN") {
+        console.log(NAME_TAG + WARN_TAG + PART_TAG, info)
+
+    } else if (type === "LOG") {
+        console.log(NAME_TAG + LOG_TAG + PART_TAG, info)
+
+    } else {
+        console.log(NAME_TAG + NAME_TAG + PART_TAG, info)
+    }
+
+}
 
 export const SettingPage: FC = () => {
-    const [test, setTest] = useAtom(testAtom);
+    const [amllRubyUsed, setAmllRubyUsed] = useAtom(amllRubyUsedAtom);
+    const [amllAmbiguousControl, setAmllAmbiguousControl] = useAtom(amllAmbiguousControlAtom)
+
+    function setAmllRubyUsedFunc(used: boolean) {
+        setAmllRubyUsed(used);
+
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('ruby_used');
+        if (used) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'ruby_used';  // 设置 id
+            styleElement.innerHTML = `
+div.amll-lyric-player.dom:has(ruby) > div[class*="_lyricLine"] {
+    padding-top: 2rem;
+}
+
+rt {
+    position: absolute;
+    top: 2.5rem;
+}
+            `;
+            consoleLog("INFO", "extend", "Ruby兼容开启");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+            consoleLog("INFO", "extend", "Ruby兼容关闭");
+        }
+    }
+
+    function setAmllAmbiguousControlFunc(fix: boolean) {
+        setAmllAmbiguousControl(fix);
+
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('ctrl_bar');
+        if (fix) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'ctrl_bar';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_horizontalLayout"] > div[class*="_controls"]:has(> div[class*="_controls"]:empty) {
+    justify-content: center;
+}
+
+div[class*="_cover"]:has(+ div[class*="_controls"] > div[class*="_controls"]:empty) > div[class*="_cover"] {
+    position: absolute;
+    top: 10%;
+}
+            `;
+            consoleLog("INFO", "fix", "自动调整左半布局");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+            consoleLog("INFO", "fix", "不调整左半布局");
+        }
+    }
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
+
+    // 前置组件
+    const SubTitle: FC<PropsWithChildren<TextProps>> = ({ children, ...props }) => {
+        return (
+            <Text weight="bold" size="4" my="4" as="div" {...props}>
+                {children}
+            </Text>
+        );
+    };
     
     return <div>
-        Test Plugin Setting Page
-        <div>{test}</div>
-        <button onClick={() => setTest(v => v + 1)}>
-            Increase
-        </button>
+        <SubTitle>布局调整</SubTitle>
+        <Card mt="2">
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">无控制条时调整左半布局</Text>
+                </Flex>
+                <Switch checked={amllAmbiguousControl}
+                        onCheckedChange={(e) => setAmllAmbiguousControlFunc(e)}/>
+            </Flex>
+        </Card>
+        <SubTitle>额外兼容</SubTitle>
+        <Card mt="2">
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">兼容ruby注释</Text>
+                </Flex>
+                <Switch checked={amllRubyUsed}
+                        onCheckedChange={(e) => setAmllRubyUsedFunc(e)}/>
+            </Flex>
+        </Card>
     </div>
 }
+
+export const amllRubyUsedAtom = atomWithStorage(
+    "amllRubyUsedAtom",
+    false
+)
+
+export const amllAmbiguousControlAtom = atomWithStorage(
+    "amllAmbiguousControlAtom",
+    false
+)
