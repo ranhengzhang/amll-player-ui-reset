@@ -19,13 +19,18 @@ export const ExtensionContext: FC = () => {
             }
             styleElement.id = 'ruby_used';  // 设置 id
             styleElement.innerHTML = `
-div.amll-lyric-player.dom:has(ruby) > div[class*="_lyricLine"] {
-    padding-top: 2rem;
+div[class*="_lyricLine"]:has(ruby) {
+    padding-top: 3rem;
 }
 
-rt {
+div.amll-lyric-player.dom rt {
+    font-size: 40%;
+    font-weight: lighter;
     position: absolute;
-    top: 2.5rem;
+    top: 0.25em;
+    mask-image: linear-gradient(to right,rgba(0,0,0,var(--bright-mask-alpha, 1.0)) 45%,rgba(0,0,0,var(--dark-mask-alpha, 1.0)) 55%);
+    mask-repeat: no-repeat;
+    mask-size: 210% 100%;
 }
             `;
             consoleLog("INFO", "extend", "Ruby兼容开启");
