@@ -2,7 +2,7 @@ import { atom, useAtom } from "jotai";
 import {atomWithStorage} from "jotai/utils";
 import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
-import {TextProps, Text, Flex, Switch, Card} from "@radix-ui/themes";
+import {TextProps, Text, Flex, Switch, Card, Separator} from "@radix-ui/themes";
 
 const WARN_TAG = chalk.bgHex("#de2a18").hex("#FFFFFF")(" WARN ");
 const INFO_TAG = chalk.bgHex("#2376b7").hex("#FFFFFF")(" INFO ");
@@ -34,6 +34,7 @@ export function consoleLog(type: string, part: string, info: string) {
 export const SettingPage: FC = () => {
     const [amllRubyUsed, setAmllRubyUsed] = useAtom(amllRubyUsedAtom);
     const [amllAmbiguousControl, setAmllAmbiguousControl] = useAtom(amllAmbiguousControlAtom)
+    const [amllBgPadding, setAmllBgPadding] = useAtom(amllBgPaddingAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -102,6 +103,36 @@ div[class*="_cover"]:has(+ div[class*="_controls"] > div[class*="_controls"]:emp
         }
     }
 
+    function setAmllBgPaddingFunc(fix: boolean) {
+        setAmllBgPadding(fix);
+
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('bg_padding');
+        if (fix) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'bg_padding';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_lyricLine"]:not([class*="_lyricDuetLine"]) {
+    padding-left: 1em;
+}
+
+div[class*="_lyricLine"][class*="_lyricDuetLine"] {
+    padding-right: 1em;
+}
+            `;
+            consoleLog("INFO", "fix", "对齐歌词边距");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+            consoleLog("INFO", "fix", "还原歌词边距");
+        }
+    }
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
@@ -125,6 +156,14 @@ div[class*="_cover"]:has(+ div[class*="_controls"] > div[class*="_controls"]:emp
                 <Switch checked={amllAmbiguousControl}
                         onCheckedChange={(e) => setAmllAmbiguousControlFunc(e)}/>
             </Flex>
+            <Separator my="3" size="4" />
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">对齐歌词边距</Text>
+                </Flex>
+                <Switch checked={amllBgPadding}
+                        onCheckedChange={(e) => setAmllBgPaddingFunc(e)}/>
+            </Flex>
         </Card>
         <SubTitle>额外兼容</SubTitle>
         <Card mt="2">
@@ -141,6 +180,11 @@ div[class*="_cover"]:has(+ div[class*="_controls"] > div[class*="_controls"]:emp
 
 export const amllRubyUsedAtom = atomWithStorage(
     "amllRubyUsedAtom",
+    false
+)
+
+export const amllBgPaddingAtom = atomWithStorage(
+    "amllBgPaddingAtom",
     false
 )
 

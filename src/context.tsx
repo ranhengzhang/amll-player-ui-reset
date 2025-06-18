@@ -36,6 +36,29 @@ div.amll-lyric-player.dom rt {
             consoleLog("INFO", "extend", "Ruby兼容开启");
         }
 
+        const storedBgPaddingAtom = localStorage.getItem('amllBgPaddingAtom');
+        consoleLog('INFO', 'context', "storedBgPaddingAtom: " + storedBgPaddingAtom);
+        if (storedBgPaddingAtom) {
+            // 创建一个 <style> 标签，并为其设置 id
+            let styleElement = document.getElementById('bg_padding');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'bg_padding';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_lyricLine"]:not([class*="_lyricDuetLine"]) {
+    padding-left: 1em;
+}
+
+div[class*="_lyricLine"][class*="_lyricDuetLine"] {
+    padding-right: 1em;
+}
+            `;
+            consoleLog("INFO", "extend", "歌词边距强对齐");
+        }
+
         const storedAmbiguousControlAtom = localStorage.getItem('amllAmbiguousControlAtom');
         consoleLog('INFO', 'context', "storedAmbiguousControlAtom: " + storedAmbiguousControlAtom);
         if (storedAmbiguousControlAtom) {
