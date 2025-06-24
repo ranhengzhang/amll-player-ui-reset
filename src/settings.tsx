@@ -117,11 +117,11 @@ div[class*="_cover"]:has(+ div[class*="_controls"] > div[class*="_controls"]:emp
             styleElement.id = 'bg_padding';  // 设置 id
             styleElement.innerHTML = `
 div[class*="_lyricLine"]:not([class*="_lyricDuetLine"]) {
-    padding-left: 1em;
+    padding-left: 5vh !important;
 }
 
 div[class*="_lyricLine"][class*="_lyricDuetLine"] {
-    padding-right: 1em;
+    padding-right: 5vh !important;
 }
             `;
             consoleLog("INFO", "fix", "对齐歌词边距");

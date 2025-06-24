@@ -49,11 +49,11 @@ div.amll-lyric-player.dom rt {
             styleElement.id = 'bg_padding';  // 设置 id
             styleElement.innerHTML = `
 div[class*="_lyricLine"]:not([class*="_lyricDuetLine"]) {
-    padding-left: 1em;
+    padding-left: 5vh !important;
 }
 
 div[class*="_lyricLine"][class*="_lyricDuetLine"] {
-    padding-right: 1em;
+    padding-right: 5vh !important;
 }
             `;
             consoleLog("INFO", "extend", "歌词边距强对齐");
