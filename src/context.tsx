@@ -152,7 +152,7 @@ div[class*="_coverInner"] {
     background-color: transparent !important;
 }
                 `, storedCircleCoverAtom == "true" ? `
-div[class*="_coverInner"] > div[class*="_coverInner"] {
+div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
     border-radius: 50% !important;
 }
                 `:'', storedCircleCoverAtom == "true" && storedRotaryCoverAtom == "true" ? `
@@ -176,18 +176,19 @@ div[class*="_coverInner"] > div[class*="_coverInner"] {
     animation-play-state: running;
 }
                 ` : '', storedCircleCoverAtom == "true" && storedCenterHoleAtom == "true" ? `
-div[class*="_coverInner"] > div[class*="_coverInner"] {
-    mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15%, #FFFFFF77 20%, black 20%, black 68%, #FFFFFFAA 68%)
+div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
+    mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15.25%, #FFFFFF77 20%, black 20.25%, black 68%, #FFFFFFAA 68.25%);
 }
 
-div[class*="_coverInner"] > div[class*="_coverInner"]::before {
+div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
     content: "";
     position: absolute;
     background: white;
     width: 100%;
     height: 100%;
-    mask: radial-gradient(circle, black 20%, transparent 20%, transparent 65%, black 65%);
+    mask: radial-gradient(circle, black 20%, transparent 20.25%, transparent 65%, black 65.25%);
     opacity: .5;
+    z-index: 1;
 }
                 ` : ''].join('\n')
             consoleLog("INFO", "set", "专辑透明底");

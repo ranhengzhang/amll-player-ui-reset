@@ -215,7 +215,7 @@ div[class*="_coverInner"] {
     background-color: transparent !important;
 }
                 `, circle_cover ? `
-div[class*="_coverInner"] > div[class*="_coverInner"] {
+div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
     border-radius: 50% !important;
 }
                 ` : '', circle_cover && rotary_cover ? `
@@ -239,18 +239,19 @@ div[class*="_coverInner"] > div[class*="_coverInner"] {
     animation-play-state: running;
 }
                 ` : '', circle_cover && center_hole ? `
-div[class*="_coverInner"] > div[class*="_coverInner"] {
-    mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15%, #FFFFFF77 20%, black 20%, black 68%, #FFFFFFAA 68%)
+div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
+    mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15.25%, #FFFFFF77 20%, black 20.25%, black 68%, #FFFFFFAA 68.25%);
 }
 
-div[class*="_coverInner"] > div[class*="_coverInner"]::before {
+div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
     content: "";
     position: absolute;
     background: white;
     width: 100%;
     height: 100%;
-    mask: radial-gradient(circle, black 20%, transparent 20%, transparent 65%, black 65%);
+    mask: radial-gradient(circle, black 20%, transparent 20.25%, transparent 65%, black 65.25%);
     opacity: .5;
+    z-index: 1;
 }
                 ` : ''].join("\n")
             } else {
@@ -297,7 +298,7 @@ div[class*="_coverInner"] > div[class*="_coverInner"]::before {
             </Text>
         );
     };
-    
+
     return <div>
         <SubTitle>布局调整</SubTitle>
         <Card mt="2">
