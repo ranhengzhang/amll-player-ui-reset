@@ -194,7 +194,7 @@ div[class*="_coverInner"] {
 
 div[class*="_coverInner"] {
     /* 旋转动画 */
-    animation: rotate ${storedRotaryCycleAtom ?? 36}s linear infinite;
+    animation: rotate ${parseFloat(storedRotaryCycleAtom) || 36}s linear infinite;
     ${storedCenterHoleAtom == "true" ? "mask: radial-gradient(circle, transparent 15%, #FFFFFFAA 15%, #FFFFFFAA 20%, black 20%, black 68%, #FFFFFFAA 68%)" : ""}
 }
 
