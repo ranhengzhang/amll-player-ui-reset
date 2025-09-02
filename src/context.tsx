@@ -159,7 +159,7 @@ div[class*="_coverInner"] {
             }
             styleElement.id = 'circle_cover';  // 设置 id
             styleElement.innerHTML = `
-div[class*="_coverInner"] {
+div[class*="_coverInner"] > div[class*="_coverInner"] {
     border-radius: 50% !important;
 }
                 `
@@ -172,7 +172,7 @@ div[class*="_coverInner"] {
         consoleLog('INFO', 'context', "storedRotaryCoverAtom: " + storedRotaryCoverAtom);
         consoleLog('INFO', 'context', "storedCenterHoleAtom: " + storedCenterHoleAtom);
         consoleLog('INFO', 'context', "storedRotaryCycleAtom: " + storedRotaryCycleAtom);
-        if (storedRotaryCoverAtom == "true") {
+        if (storedRotaryCoverAtom == "true" || storedCenterHoleAtom == "true") {
             // 创建一个 <style> 标签，并为其设置 id
             let styleElement = document.getElementById('rotary_cover');
             if (!styleElement) {
@@ -181,7 +181,7 @@ div[class*="_coverInner"] {
                 document.head.appendChild(styleElement);
             }
             styleElement.id = 'rotary_cover';  // 设置 id
-            styleElement.innerHTML = `
+            styleElement.innerHTML = [`
 /* 关键帧定义 */
 @keyframes rotate {
     0% {
@@ -192,13 +192,14 @@ div[class*="_coverInner"] {
     }
 }
 
-div[class*="_coverInner"] {
+div[class*="_coverInner"] > div[class*="_coverInner"] {
     /* 旋转动画 */
     animation: rotate ${parseFloat(storedRotaryCycleAtom) || 36}s linear infinite;
-    ${storedCenterHoleAtom == "true" ? "mask: radial-gradient(circle, transparent 15%, #FFFFFFAA 15%, #FFFFFFAA 20%, black 20%, black 68%, #FFFFFFAA 68%)" : ""}
+}`, storedCenterHoleAtom == "true" ? `
+div[class*="_coverInner"] > div[class*="_coverInner"] {
+    mask: radial-gradient(circle, transparent 15%, #FFFFFFAA 15%, #FFFFFFAA 20%, black 20%, black 68%, #FFFFFFAA 68%)
 }
 
-${storedCenterHoleAtom == "true" ? `
 div[class*="_coverInner"] > div[class*="_coverInner"]::before {
     content: "";
     position: absolute;
@@ -208,8 +209,7 @@ div[class*="_coverInner"] > div[class*="_coverInner"]::before {
     mask: radial-gradient(circle, black 20%, transparent 20%, transparent 65%, black 65%);
     opacity: .5;
 }
-` : ``}
-                `
+` : ''].join("\n")
             consoleLog("INFO", "set", "专辑旋转封面");
         }
     }, []);

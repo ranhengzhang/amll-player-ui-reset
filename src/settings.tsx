@@ -215,7 +215,7 @@ div[class*="_coverInner"] {
     background-color: transparent !important;
 }
                 ` : '', circle_cover ? `
-div[class*="_coverInner"] {
+div[class*="_coverInner"] > div[class*="_coverInner"] {
     border-radius: 50% !important;
 }
                 ` : '', rotary_cover ? `
@@ -229,12 +229,15 @@ div[class*="_coverInner"] {
     }
 }
 
-div[class*="_coverInner"] {
+div[class*="_coverInner"] > div[class*="_coverInner"] {
     /* 旋转动画 */
     animation: rotate ${rotary_cycle || 36}s linear infinite;
-    ${center_hole ? "mask: radial-gradient(circle, transparent 15%, #FFFFFFAA 15%, #FFFFFFAA 20%, black 20%, black 68%, #FFFFFFAA 68%)" : ""}
 }
                 ` : '', center_hole ? `
+div[class*="_coverInner"] > div[class*="_coverInner"] {
+    mask: radial-gradient(circle, transparent 15%, #FFFFFFAA 15%, #FFFFFFAA 20%, black 20%, black 68%, #FFFFFFAA 68%)
+}
+
 div[class*="_coverInner"] > div[class*="_coverInner"]::before {
     content: "";
     position: absolute;
