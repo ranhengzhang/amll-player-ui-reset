@@ -129,59 +129,33 @@ div[class*="_romanWord"] {
         }
 
         const storedTransCoverAtom = localStorage.getItem('amllTransCoverAtom');
-        consoleLog('INFO', 'context', "storedTransCoverAtom: " + storedTransCoverAtom);
-        if (storedTransCoverAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('trans_cover');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
-            }
-            styleElement.id = 'trans_cover';  // 设置 id
-            styleElement.innerHTML = `
-div[class*="_coverInner"] {
-    background-color: transparent !important;
-}
-                `
-            consoleLog("INFO", "set", "专辑透明底");
-        }
-
         const storedCircleCoverAtom = localStorage.getItem('amllCircleCoverAtom');
-        consoleLog('INFO', 'context', "storedCircleCoverAtom: " + storedCircleCoverAtom);
-        if (storedCircleCoverAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('circle_cover');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
-            }
-            styleElement.id = 'circle_cover';  // 设置 id
-            styleElement.innerHTML = `
-div[class*="_coverInner"] > div[class*="_coverInner"] {
-    border-radius: 50% !important;
-}
-                `
-            consoleLog("INFO", "set", "专辑圆形封面");
-        }
-
         const storedRotaryCoverAtom = localStorage.getItem('amllRotaryCoverAtom');
         const storedCenterHoleAtom = localStorage.getItem('amllCenterHoleAtom');
         const storedRotaryCycleAtom = localStorage.getItem('amllRotaryCycleAtom');
+        consoleLog('INFO', 'context', "storedTransCoverAtom: " + storedTransCoverAtom);
+        consoleLog('INFO', 'context', "storedCircleCoverAtom: " + storedCircleCoverAtom);
         consoleLog('INFO', 'context', "storedRotaryCoverAtom: " + storedRotaryCoverAtom);
         consoleLog('INFO', 'context', "storedCenterHoleAtom: " + storedCenterHoleAtom);
         consoleLog('INFO', 'context', "storedRotaryCycleAtom: " + storedRotaryCycleAtom);
-        if (storedRotaryCoverAtom == "true" || storedCenterHoleAtom == "true") {
+        if (storedTransCoverAtom == "true") {
             // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('rotary_cover');
+            let styleElement = document.getElementById('cover');
             if (!styleElement) {
                 styleElement = document.createElement('style');
                 // 将 <style> 标签添加到 head 中
                 document.head.appendChild(styleElement);
             }
-            styleElement.id = 'rotary_cover';  // 设置 id
+            styleElement.id = 'cover';  // 设置 id
             styleElement.innerHTML = [`
+div[class*="_coverInner"] {
+    background-color: transparent !important;
+}
+                `, storedCircleCoverAtom == "true" ? `
+div[class*="_coverInner"] > div[class*="_coverInner"] {
+    border-radius: 50% !important;
+}
+                `:'', storedCircleCoverAtom == "true" && storedRotaryCoverAtom == "true" ? `
 /* 关键帧定义 */
 @keyframes rotate {
     0% {
@@ -201,9 +175,9 @@ div[class*="_coverInner"] > div[class*="_coverInner"] {
     /* 旋转动画 */
     animation-play-state: running;
 }
-`, storedCenterHoleAtom == "true" ? `
+                ` : '', storedCircleCoverAtom == "true" && storedCenterHoleAtom == "true" ? `
 div[class*="_coverInner"] > div[class*="_coverInner"] {
-    mask: radial-gradient(circle, transparent 15%, #FFFFFFAA 15%, #FFFFFFAA 20%, black 20%, black 68%, #FFFFFFAA 68%)
+    mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15%, #FFFFFF77 20%, black 20%, black 68%, #FFFFFFAA 68%)
 }
 
 div[class*="_coverInner"] > div[class*="_coverInner"]::before {
@@ -215,8 +189,14 @@ div[class*="_coverInner"] > div[class*="_coverInner"]::before {
     mask: radial-gradient(circle, black 20%, transparent 20%, transparent 65%, black 65%);
     opacity: .5;
 }
-` : ''].join("\n")
-            consoleLog("INFO", "set", "专辑旋转封面");
+                ` : ''].join('\n')
+            consoleLog("INFO", "set", "专辑透明底");
+            if (storedCircleCoverAtom == "true")
+                consoleLog("INFO", "set", "专辑圆形封面");
+            if (storedRotaryCoverAtom == "true")
+                consoleLog("INFO", "set", "专辑旋转封面");
+            if (storedCenterHoleAtom == "true")
+                consoleLog("INFO", "set", "专辑仿真镂空");
         }
     }, []);
 
