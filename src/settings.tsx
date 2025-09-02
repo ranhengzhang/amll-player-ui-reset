@@ -2,7 +2,7 @@ import { atom, useAtom } from "jotai";
 import {atomWithStorage} from "jotai/utils";
 import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
-import {TextProps, Text, Flex, Switch, Card, Separator} from "@radix-ui/themes";
+import {TextProps, Text, Flex, Switch, Card, Separator, TextField} from "@radix-ui/themes";
 
 const WARN_TAG = chalk.bgHex("#de2a18").hex("#FFFFFF")(" WARN ");
 const INFO_TAG = chalk.bgHex("#2376b7").hex("#FFFFFF")(" INFO ");
@@ -35,6 +35,13 @@ export const SettingPage: FC = () => {
     const [amllRubyUsed, setAmllRubyUsed] = useAtom(amllRubyUsedAtom);
     const [amllAmbiguousControl, setAmllAmbiguousControl] = useAtom(amllAmbiguousControlAtom)
     const [amllBgPadding, setAmllBgPadding] = useAtom(amllBgPaddingAtom)
+    const [amllFixControl, setAmllFixControl] = useAtom(amllFixControlAtom)
+    const [amllRomaGap, setAmllRomaGap] = useAtom(amllRomaGapAtom)
+    const [amllTransCover, setAmllTransCover] = useAtom(amllTransCoverAtom)
+    const [amllCircleCover, setAmllCircleCover] = useAtom(amllCircleCoverAtom)
+    const [amllRotaryCover, setAmllRotaryCover] = useAtom(amllRotaryCoverAtom)
+    const [amllCenterHole, setAmllCenterHole] = useAtom(amllCenterHoleAtom)
+    const [amllRotaryCycle, setAmllRotaryCycle] = useAtom(amllRotaryCycleAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -133,6 +140,143 @@ div[class*="_lyricLine"][class*="_lyricDuetLine"] {
         }
     }
 
+    function setAmllFixControlFunc(fix: boolean) {
+        setAmllFixControl(fix);
+
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('fix_control');
+        if (fix) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'fix_control';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_controlThumb"] > button {
+    position: relative;
+    left: 50%;
+}
+            `;
+            consoleLog("INFO", "fix", "修复关闭按钮定位");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+            consoleLog("INFO", "fix", "还原关闭按钮");
+        }
+    }
+
+    function setAmllRomaGapFunc(fix:boolean) {
+        setAmllRomaGap(fix);
+
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('roma_gap');
+        if (fix) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'roma_gap';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_romanWord"] {
+    margin-right: 0.25em;
+}
+`
+            consoleLog("INFO", "fix", "调整逐字音译字间距");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+            consoleLog("INFO", "fix", "还原逐字音译字间距");
+        }
+    }
+
+    let [setAmllTransCoverFunc, setAmllCircleCoverFunc, setAmllRotaryCoverFunc, setAmllCenterHoleFunc, setAmllRotaryCycleFunc] =(()=> {
+        let trans_cover = amllTransCover;
+        let circle_cover = amllCircleCover;
+        let rotary_cover = amllRotaryCover;
+        let center_hole = amllCenterHole;
+        let rotary_cycle = amllRotaryCycle;
+
+        let set_cover = (log: () => void)=> {
+            log()
+            let styleElement = document.getElementById('cover');
+            if (trans_cover) {
+                if (!styleElement) {
+                    styleElement = document.createElement('style');
+                    // 将 <style> 标签添加到 head 中
+                    document.head.appendChild(styleElement);
+                }
+                styleElement.id = 'cover';  // 设置 id
+                styleElement.innerHTML = [trans_cover ? `
+div[class*="_coverInner"] {
+    background-color: transparent !important;
+}
+                ` : '', circle_cover ? `
+div[class*="_coverInner"] {
+    border-radius: 50% !important;
+}
+                ` : '', rotary_cover ? `
+/* 关键帧定义 */
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+div[class*="_coverInner"] {
+    /* 旋转动画 */
+    animation: rotate ${rotary_cycle || 36}s linear infinite;
+    ${center_hole ? "mask: radial-gradient(circle, transparent 15%, #FFFFFFAA 15%, #FFFFFFAA 20%, black 20%, black 68%, #FFFFFFAA 68%)" : ""}
+}
+                ` : '', center_hole ? `
+div[class*="_coverInner"] > div[class*="_coverInner"]::before {
+    content: "";
+    position: absolute;
+    background: white;
+    width: 100%;
+    height: 100%;
+    mask: radial-gradient(circle, black 20%, transparent 20%, transparent 65%, black 65%);
+    opacity: .5;
+}
+                ` : ''].join("\n")
+            } else {
+                if (styleElement) {
+                    document.head.removeChild(styleElement);
+                }
+            }
+        }
+
+        return [(trans:boolean)=>{
+            setAmllTransCover(trans);
+            trans_cover = trans;
+            set_cover(()=>consoleLog("INFO", "context", "AmllTransCoverAtom: " + trans_cover));
+        },(circle:boolean)=>{
+            setAmllCircleCover(circle);
+            circle_cover = circle;
+            set_cover(()=>consoleLog("INFO", "context", "AmllCircleCoverAtom: " + circle_cover));
+        },(rotary:boolean)=>{
+            setAmllRotaryCover(rotary);
+            rotary_cover = rotary;
+            set_cover(()=>consoleLog("INFO", "context", "AmllRotaryCoverAtom: " + rotary_cover));
+        },(hole:boolean)=>{
+            setAmllCenterHole(hole);
+            center_hole = hole;
+            set_cover(()=>consoleLog("INFO", "context", "AmllCenterHoleAtom: " + center_hole));
+        },(cycle:string)=>{
+            const v = parseFloat(cycle)
+            if (isNaN(v) || v == 0) return
+            setAmllRotaryCycle(cycle);
+            rotary_cycle = cycle;
+            set_cover(()=>consoleLog("INFO", "context", "AmllRotaryCycleAtom: " + rotary_cycle));
+        }]
+    })()
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
@@ -164,6 +308,20 @@ div[class*="_lyricLine"][class*="_lyricDuetLine"] {
                 <Switch checked={amllBgPadding}
                         onCheckedChange={(e) => setAmllBgPaddingFunc(e)}/>
             </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">关闭按钮对齐</Text>
+                </Flex>
+                <Switch checked={amllFixControl}
+                        onCheckedChange={(e) => setAmllFixControlFunc(e)}/>
+            </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">逐字音译间距</Text>
+                </Flex>
+                <Switch checked={amllRomaGap}
+                        onCheckedChange={(e) => setAmllRomaGapFunc(e)}/>
+            </Flex>
         </Card>
         <SubTitle>额外兼容</SubTitle>
         <Card mt="2">
@@ -174,6 +332,53 @@ div[class*="_lyricLine"][class*="_lyricDuetLine"] {
                 <Switch checked={amllRubyUsed}
                         onCheckedChange={(e) => setAmllRubyUsedFunc(e)}/>
             </Flex>
+        </Card>
+        <SubTitle>专辑封面</SubTitle>
+        <Card mt="2">
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">透明底</Text>
+                </Flex>
+                <Switch checked={amllTransCover}
+                        onCheckedChange={(e) => setAmllTransCoverFunc(e)}/>
+            </Flex>
+            {amllTransCover ?
+                <Flex direction="row" align="center" gap="4" my="2">
+                    <Flex direction="column" flexGrow="1">
+                        <Text as="div">圆形封面</Text>
+                    </Flex>
+                    <Switch checked={amllCircleCover}
+                            onCheckedChange={(e) => setAmllCircleCoverFunc(e)}/>
+                </Flex>
+                : null}
+            {amllCircleCover ?
+                <Flex direction="row" align="center" gap="4" my="2">
+                    <Flex direction="column" flexGrow="1">
+                        <Text as="div">旋转封面</Text>
+                    </Flex>
+                    <Switch checked={amllRotaryCover}
+                            onCheckedChange={(e) => setAmllRotaryCoverFunc(e)}/>
+                </Flex>
+                : null}
+            {amllCircleCover ?
+                <Flex direction="row" align="center" gap="4" my="2">
+                    <Flex direction="column" flexGrow="1">
+                        <Text as="div">仿真挖孔</Text>
+                    </Flex>
+                    <Switch checked={amllCenterHole}
+                            onCheckedChange={(e) => setAmllCenterHoleFunc(e)}/>
+                </Flex>
+                : null}
+            {amllCircleCover ?
+                <Flex direction="row" align="center" gap="4" my="2">
+                    <Flex direction="column" flexGrow="1">
+                        <Text as="div">旋转周期</Text>
+                    </Flex>
+                    <TextField.Root type="number" value={amllRotaryCycle}
+                                    onChange={(e) => setAmllRotaryCycleFunc(e.currentTarget.value)}/>
+                    s
+                </Flex>
+                : null}
         </Card>
     </div>
 }
@@ -191,4 +396,39 @@ export const amllBgPaddingAtom = atomWithStorage(
 export const amllAmbiguousControlAtom = atomWithStorage(
     "amllAmbiguousControlAtom",
     false
+)
+
+export const amllFixControlAtom = atomWithStorage(
+    "amllFixControlAtom",
+    false
+)
+
+export const amllRomaGapAtom = atomWithStorage(
+    "amllRomaGapAtom",
+    false
+)
+
+export const amllTransCoverAtom = atomWithStorage(
+    "amllTransCoverAtom",
+    false
+)
+
+export const amllCircleCoverAtom = atomWithStorage(
+    "amllCircleCoverAtom",
+    false
+)
+
+export const amllRotaryCoverAtom = atomWithStorage(
+    "amllRotaryCoverAtom",
+    false
+)
+
+export const amllCenterHoleAtom = atomWithStorage(
+    "amllCenterHoleAtom",
+    false
+)
+
+export const amllRotaryCycleAtom = atomWithStorage(
+    "amllRotaryCycleAtom",
+    "36"
 )
