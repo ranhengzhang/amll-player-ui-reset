@@ -45,6 +45,9 @@ export const SettingPage: FC = () => {
     const [amllCenterHole, setAmllCenterHole] = useAtom(amllCenterHoleAtom)
     const [amllRotaryCycle, setAmllRotaryCycle] = useAtom(amllRotaryCycleAtom)
     const [amllRomanWord, setAmllRomanWord] = useAtom(amllRomanWordAtom)
+    const [amllTopRoman, setAmllTopRoman] = useAtom(amllTopRomanAtom)
+    const [amllHideRoman, setAmllHideRoman] = useAtom(amllHideRomanAtom)
+    const [amllSwapped, setAmllSwapped] = useAtom(enableLyricSwapTransRomanLineAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -293,32 +296,71 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
         }]
     })()
 
-    function setAmllRomanWordFunc(fix: boolean) {
-        setAmllRomanWord(fix);
+    function setAmllHideRomanFunc(hide:boolean) {
+        setAmllHideRoman(hide);
 
-        // 创建一个 <style> 标签，并为其设置 id
-        let styleElement = document.getElementById('roman_word');
-        if (fix) {
+        let styleElement = document.getElementById('hide_roman');
+        if (hide) {
             if (!styleElement) {
                 styleElement = document.createElement('style');
                 // 将 <style> 标签添加到 head 中
                 document.head.appendChild(styleElement);
             }
-            styleElement.id = 'roman_word';  // 设置 id
+            styleElement.id = 'hide_roman';  // 设置 id
             styleElement.innerHTML = `
-div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanWord"]) {
-    display: inline-flex;
-    flex-direction: column;
+div[class*="_lyricLine"]:has( div[class*="_romanWord"]) > div[class*="_lyricSubLine"]:nth-child(${amllSwapped ? 2 : 3}) {
+    display: none;
 }
-            `;
-            consoleLog("INFO", "extend", "修复无音译音节下沉");
+            `
         } else {
-            if (styleElement) {
-                document.head.removeChild(styleElement);
-            }
-            consoleLog("INFO", "extend", "取消修复无音译音节下沉");
+                if (styleElement) {
+                    document.head.removeChild(styleElement);
+                }
+                consoleLog("INFO", "fix", "逐字音译时显示行音译");
         }
     }
+
+    let [setAmllRomanWordFunc, setAmllTopRomanFunc] = (()=>{
+        let roman_word = amllRomanWord;
+        let top_roman = amllTopRoman;
+        let set_cover = (log: () => void)=> {
+            log()
+            let styleElement = document.getElementById('roman');
+            if (roman_word) {
+                if (!styleElement) {
+                    styleElement = document.createElement('style');
+                    // 将 <style> 标签添加到 head 中
+                    document.head.appendChild(styleElement);
+                }
+                styleElement.id = 'roman';  // 设置 id
+                styleElement.innerHTML = [`
+div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanWord"]) {
+    display: inline-flex;
+    flex-direction: ${top_roman ? "column-reverse" : "column"};
+}
+                `, top_roman ? `
+div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-image"]:not(:has(> div[class*="_romanWord"])) {
+    position: relative;
+    top: 1em;
+}
+                ` : ""].join('\n')
+            } else {
+                if (styleElement) {
+                    document.head.removeChild(styleElement);
+                }
+            }
+        }
+
+        return [(word:boolean)=>{
+            setAmllRomanWord(word);
+            roman_word = word;
+            set_cover(()=>consoleLog("INFO", "context", "AmllRomanWordAtom: " + roman_word));
+        },(top:boolean)=>{
+            setAmllTopRoman(top);
+            top_roman = top;
+            set_cover(()=>consoleLog("INFO", "context", "AmllTopRomanAtom: " + top_roman));
+        }]
+    })()
 
     useEffect(() => {
         console.log("SettingPage Loaded");
@@ -367,11 +409,27 @@ div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanW
             </Flex>
             <Flex direction="row" align="center" gap="4" my="2">
                 <Flex direction="column" flexGrow="1">
+                    <Text as="div">逐字音译时隐藏行音译</Text>
+                </Flex>
+                <Switch checked={amllHideRoman}
+                        onCheckedChange={(e) => setAmllHideRomanFunc(e)}/>
+            </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
                     <Text as="div">逐字音译对齐</Text>
                 </Flex>
                 <Switch checked={amllRomanWord}
                         onCheckedChange={(e) => setAmllRomanWordFunc(e)}/>
             </Flex>
+            {amllRomanWord ?
+                <Flex direction="row" align="center" gap="4" my="2">
+                    <Flex direction="column" flexGrow="1">
+                        <Text as="div">逐字音译居上</Text>
+                    </Flex>
+                    <Switch checked={amllTopRoman}
+                            onCheckedChange={(e) => setAmllTopRomanFunc(e)}/>
+                </Flex>
+                : null}
         </Card>
         <SubTitle>额外兼容</SubTitle>
         <Card mt="2">
@@ -487,3 +545,18 @@ export const amllRomanWordAtom = atomWithStorage(
     "amllRomanWordAtom",
     false
 )
+
+export const amllTopRomanAtom = atomWithStorage(
+    "amllTopRomanAtom",
+    false
+)
+
+export const amllHideRomanAtom = atomWithStorage(
+    "amllHideRomanAtom",
+    false
+)
+
+export const enableLyricSwapTransRomanLineAtom = atomWithStorage(
+    "amll-react-full.enableLyricSwapTransRomanLineAtom",
+    false,
+);

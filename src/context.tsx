@@ -13,6 +13,17 @@ export const ExtensionContext: FC = () => {
     }, []);
 
     useEffect(() => {
+        const storedLyricSwappedAtom = localStorage.getItem('amll-react-full.enableLyricSwapTransRomanLineAtom');
+        const getSwapped = ((storedLyricSwappedAtom: string)=>{
+            let val = false;
+            if (storedLyricSwappedAtom) {
+                const storedLyricSwapped = storedLyricSwappedAtom?.replace(/^"/g, '').replace(/"$/g, '');
+                val = storedLyricSwapped !== "false";
+            }
+            consoleLog("LOG", "ui", "swapped: " + (storedLyricSwappedAtom??val));
+            return ()=>val;
+        })(storedLyricSwappedAtom);
+
         const storedRubyUsedAtom = localStorage.getItem('amllRubyUsedAtom');
         consoleLog('INFO', 'context', "storedRubyUsedAtom: " + storedRubyUsedAtom);
         if (storedRubyUsedAtom == "true") {
@@ -128,8 +139,29 @@ div[class*="_romanWord"] {
             consoleLog("INFO", "fix", "调整逐字音译字间距");
         }
 
+        const storedHideRomanAtom = localStorage.getItem('amllHideRomanAtom');
+        consoleLog('INFO', 'context', "storedHideRomanAtom: " + storedHideRomanAtom);
+        if (storedHideRomanAtom == "true") {
+            // 创建一个 <style> 标签，并为其设置 id
+            let styleElement = document.getElementById('hide_roman');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'hide_roman';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_lyricLine"]:has( div[class*="_romanWord"]) > div[class*="_lyricSubLine"]:nth-child(${getSwapped() ? 2 : 3}) {
+    display: none;
+}
+            `
+            consoleLog("INFO", "fix", "逐字音译时隐藏行音译");
+        }
+
         const storedRomanWordAtom = localStorage.getItem('amllRomanWordAtom');
+        const storedTopRomanAtom = localStorage.getItem('amllTopRomanAtom');
         consoleLog('INFO', 'context', "storedRomanWordAtom: " + storedRomanWordAtom);
+        consoleLog('INFO', 'context', "storedTopRomanAtom: " + storedTopRomanAtom);
         if (storedRomanWordAtom == "true") {
             // 创建一个 <style> 标签，并为其设置 id
             let styleElement = document.getElementById('roman_word');
@@ -139,13 +171,20 @@ div[class*="_romanWord"] {
                 document.head.appendChild(styleElement);
             }
             styleElement.id = 'roman_word';  // 设置 id
-            styleElement.innerHTML = `
+            styleElement.innerHTML = [`
 div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanWord"]) {
     display: inline-flex;
-    flex-direction: column;
+    flex-direction: ${storedTopRomanAtom == "true" ? "column-reverse" : "column"};
 }
-            `
+            `, storedTopRomanAtom == "true" ? `
+div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-image"]:not(:has(> div[class*="_romanWord"])) {
+    position: relative;
+    top: 1em;
+}
+                ` : ""].join("\n");
             consoleLog("INFO", "fix", "修复无音译音节下沉");
+            if (storedTopRomanAtom == "true")
+                consoleLog("INFO", "fix", "音译音节居上");
         }
 
         const storedTransCoverAtom = localStorage.getItem('amllTransCoverAtom');
