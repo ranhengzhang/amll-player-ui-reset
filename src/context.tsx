@@ -128,6 +128,26 @@ div[class*="_romanWord"] {
             consoleLog("INFO", "fix", "调整逐字音译字间距");
         }
 
+        const storedRomanWordAtom = localStorage.getItem('amllRomanWordAtom');
+        consoleLog('INFO', 'context', "storedRomanWordAtom: " + storedRomanWordAtom);
+        if (storedRomanWordAtom == "true") {
+            // 创建一个 <style> 标签，并为其设置 id
+            let styleElement = document.getElementById('roman_word');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'roman_word';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanWord"]) {
+    display: inline-flex;
+    flex-direction: column;
+}
+            `
+            consoleLog("INFO", "fix", "修复无音译音节下沉");
+        }
+
         const storedTransCoverAtom = localStorage.getItem('amllTransCoverAtom');
         const storedCircleCoverAtom = localStorage.getItem('amllCircleCoverAtom');
         const storedRotaryCoverAtom = localStorage.getItem('amllRotaryCoverAtom');
@@ -148,6 +168,10 @@ div[class*="_romanWord"] {
             }
             styleElement.id = 'cover';  // 设置 id
             styleElement.innerHTML = [`
+div[class*="_cover_"] {
+    transform: perspective(0);
+}
+            
 div[class*="_coverInner"] {
     background-color: transparent !important;
 }

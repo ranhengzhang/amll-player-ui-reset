@@ -3,7 +3,9 @@ import {atomWithStorage} from "jotai/utils";
 import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
 import {TextProps, Text, Flex, Switch, Card, Separator, TextField} from "@radix-ui/themes";
-
+const x = () => {
+  
+}
 const WARN_TAG = chalk.bgHex("#de2a18").hex("#FFFFFF")(" WARN ");
 const INFO_TAG = chalk.bgHex("#2376b7").hex("#FFFFFF")(" INFO ");
 const  LOG_TAG = chalk.bgHex("#1ba784").hex("#FFFFFF")(" LOG ");
@@ -42,6 +44,7 @@ export const SettingPage: FC = () => {
     const [amllRotaryCover, setAmllRotaryCover] = useAtom(amllRotaryCoverAtom)
     const [amllCenterHole, setAmllCenterHole] = useAtom(amllCenterHoleAtom)
     const [amllRotaryCycle, setAmllRotaryCycle] = useAtom(amllRotaryCycleAtom)
+    const [amllRomanWord, setAmllRomanWord] = useAtom(amllRomanWordAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -211,6 +214,10 @@ div[class*="_romanWord"] {
                 }
                 styleElement.id = 'cover';  // 设置 id
                 styleElement.innerHTML = [`
+div[class*="_cover_"] {
+    transform: perspective(0);
+}
+                
 div[class*="_coverInner"] {
     background-color: transparent !important;
 }
@@ -286,6 +293,33 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
         }]
     })()
 
+    function setAmllRomanWordFunc(fix: boolean) {
+        setAmllRomanWord(fix);
+
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('roman_word');
+        if (fix) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'roman_word';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanWord"]) {
+    display: inline-flex;
+    flex-direction: column;
+}
+            `;
+            consoleLog("INFO", "extend", "修复无音译音节下沉");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+            consoleLog("INFO", "extend", "取消修复无音译音节下沉");
+        }
+    }
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
@@ -330,6 +364,13 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
                 </Flex>
                 <Switch checked={amllRomaGap}
                         onCheckedChange={(e) => setAmllRomaGapFunc(e)}/>
+            </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">逐字音译对齐</Text>
+                </Flex>
+                <Switch checked={amllRomanWord}
+                        onCheckedChange={(e) => setAmllRomanWordFunc(e)}/>
             </Flex>
         </Card>
         <SubTitle>额外兼容</SubTitle>
@@ -440,4 +481,9 @@ export const amllCenterHoleAtom = atomWithStorage(
 export const amllRotaryCycleAtom = atomWithStorage(
     "amllRotaryCycleAtom",
     "36"
+)
+
+export const amllRomanWordAtom = atomWithStorage(
+    "amllRomanWordAtom",
+    false
 )
