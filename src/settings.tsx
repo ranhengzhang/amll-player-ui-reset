@@ -334,7 +334,7 @@ div[class*="_lyricLine"]:has( div[class*="_romanWord"]) > div[class*="_lyricSubL
                 }
                 styleElement.id = 'roman';  // 设置 id
                 styleElement.innerHTML = [`
-div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanWord"]) {
+div[class*="_lyricMainLine"]:has( div[class*="_romanWord"]) span[style^="mask-image"] {
     display: inline-flex;
     flex-wrap: wrap;
     flex-direction: ${top_roman ? "column-reverse" : "column"};
@@ -344,9 +344,11 @@ div[class*="_lyricMainLine"] span[style^="mask-image"] > span {
     display: contents;
 }
                 `, top_roman ? `
-div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-image"]:not(:has(> div[class*="_romanWord"])) {
-    position: relative;
-    top: 1em;
+div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-image"]:not(:has(> div[class*="_romanWord"]))::after {
+    content: " ";
+    display: block;
+    font-size: .5em;
+    line-height: 1.25em;
 }
                 ` : ""].join('\n')
             } else {
