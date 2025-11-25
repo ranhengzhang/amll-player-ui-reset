@@ -174,7 +174,12 @@ div[class*="_lyricLine"]:has( div[class*="_romanWord"]) > div[class*="_lyricSubL
             styleElement.innerHTML = [`
 div[class*="_lyricMainLine"] span[style^="mask-image"]:has(> div[class*="_romanWord"]) {
     display: inline-flex;
+    flex-wrap: wrap;
     flex-direction: ${storedTopRomanAtom == "true" ? "column-reverse" : "column"};
+}
+
+div[class*="_lyricMainLine"] span[style^="mask-image"] > span {
+    display: contents;
 }
             `, storedTopRomanAtom == "true" ? `
 div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-image"]:not(:has(> div[class*="_romanWord"])) {
