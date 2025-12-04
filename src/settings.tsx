@@ -2,7 +2,7 @@ import { atom, useAtom } from "jotai";
 import {atomWithStorage} from "jotai/utils";
 import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
-import {TextProps, Text, Flex, Switch, Card, Separator, TextField} from "@radix-ui/themes";
+import {TextProps, Text, Flex, Switch, Card, Separator, TextField, Slider} from "@radix-ui/themes";
 const x = () => {
   
 }
@@ -48,6 +48,7 @@ export const SettingPage: FC = () => {
     const [amllTopRoman, setAmllTopRoman] = useAtom(amllTopRomanAtom)
     const [amllHideRoman, setAmllHideRoman] = useAtom(amllHideRomanAtom)
     const [amllSwapped, setAmllSwapped] = useAtom(enableLyricSwapTransRomanLineAtom)
+    const [amllPartPercent, setAmllPartPercent] = useAtom(amllPartPercentAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -364,6 +365,24 @@ div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-ima
         }]
     })()
 
+    const setAmllPartPercentFunc = (percent:number) => {
+        setAmllPartPercent(percent);
+
+        consoleLog("INFO", "context", "AmllPartPercentAtomAtom: " + percent);
+        let styleElement = document.getElementById('part_percent');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'part_percent';  // 设置 id
+        styleElement.innerHTML = `
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"] {
+    grid-template-columns: [info-side] .${percent}fr [player-side] .${100-percent}fr [side-controls] 0fr;
+}
+        `
+    }
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
@@ -388,6 +407,14 @@ div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-ima
                         onCheckedChange={(e) => setAmllAmbiguousControlFunc(e)}/>
             </Flex>
             <Separator my="3" size="4" />
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">专辑信息和歌词部分占比</Text>
+                </Flex>
+                <Slider defaultValue={[amllPartPercent]}
+                        onValueChange={(e) => setAmllPartPercentFunc(e[0])}/>
+                {amllPartPercent}
+            </Flex>
             <Flex direction="row" align="center" gap="4" my="2">
                 <Flex direction="column" flexGrow="1">
                     <Text as="div">对齐歌词边距</Text>
@@ -562,3 +589,8 @@ export const enableLyricSwapTransRomanLineAtom = atomWithStorage(
     "amll-react-full.enableLyricSwapTransRomanLineAtom",
     false,
 );
+
+export const amllPartPercentAtom = atomWithStorage(
+    "amllPartPercentAtom",
+    45
+)

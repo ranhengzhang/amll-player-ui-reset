@@ -1,11 +1,6 @@
 import { useEffect, type FC } from "react";
-import {
-    amllAmbiguousControlAtom,
-    amllCenterHoleAtom,
-    amllRubyUsedAtom,
-    amllTransCoverAtom,
-    consoleLog
-} from "./settings";
+import { consoleLog } from "./settings";
+import {useAtom} from "jotai";
 
 export const ExtensionContext: FC = () => {
     useEffect(() => {
@@ -291,6 +286,25 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
             }
         }
     }, [musicPlaying]);
+
+    const storedPartPercentAtom = localStorage.getItem('amllPartPercentAtom');
+    consoleLog('INFO', 'context', "storedPartPercentAtom: " + storedPartPercentAtom);
+    if (!isNaN(Number(storedPartPercentAtom))) {
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('part_percent');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'part_percent';  // 设置 id
+        styleElement.innerHTML = `
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"] {
+    grid-template-columns: [info-side] .${Number(storedPartPercentAtom)}fr [player-side] .${100-Number(storedPartPercentAtom)}fr [side-controls] 0fr;
+}
+        `
+        consoleLog("INFO", "set", `专辑信息和歌词部分占比 ${Number(storedPartPercentAtom)}:${100-Number(storedPartPercentAtom)}`);
+    }
 
     return null;
 }
