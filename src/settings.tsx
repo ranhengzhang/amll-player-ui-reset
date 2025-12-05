@@ -191,6 +191,11 @@ div[class*="_controlThumb"] > button {
 div[class*="_romanWord"] {
     margin-right: 0.25em;
 }
+
+div[class*="_lyricDuetLine"] div[class*="_romanWord"] {
+    margin-right: 0;
+    margin-left: 0.25em;
+}
 `
             consoleLog("INFO", "fix", "调整逐字音译字间距");
         } else {
