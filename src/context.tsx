@@ -7,7 +7,6 @@ export const ExtensionContext: FC = () => {
         console.log("extension context has been mounted");
     }, []);
 
-    useEffect(() => {
         const storedLyricSwappedAtom = localStorage.getItem('amll-react-full.enableLyricSwapTransRomanLineAtom');
         const getSwapped = ((storedLyricSwappedAtom: string)=>{
             let val = false;
@@ -233,19 +232,30 @@ div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-ima
                 document.head.appendChild(styleElement);
             }
             styleElement.id = 'cover';  // 设置 id
-            styleElement.innerHTML = [`
+            let innerHTML: string[] = [];
+
+            innerHTML.push(`
 div[class*="_cover_"] {
     transform: perspective(0);
 }
-            
+
 div[class*="_coverInner"] {
     background-color: transparent !important;
 }
-                `, storedCircleCoverAtom == "true" ? `
-div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
+                `)
+            consoleLog("INFO", "set", "专辑透明底");
+
+            if (storedCircleCoverAtom == "true") {
+                innerHTML.push(`
+div[class*="_coverInner"]:has(> div[class*="_coverInner"]), button[class*="_coverButton"], button[class*="_coverButton"]::before, img.rt-AvatarImage {
     border-radius: 50% !important;
+    overflow: hidden;
 }
-                `:'', storedCircleCoverAtom == "true" && storedRotaryCoverAtom == "true" ? `
+                `)
+                consoleLog("INFO", "set", "专辑圆形封面");
+
+                if (storedRotaryCoverAtom == "true")
+                    innerHTML.push(`
 /* 关键帧定义 */
 @keyframes rotate {
     0% {
@@ -256,11 +266,15 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
     }
 }
 
-div[class*="_coverInner"] > div[class*="_coverInner"] {
+div[class*="_coverInner"] > div[class*="_coverInner"], button[class*="_coverButton"] {
     animation: rotate ${parseFloat(storedRotaryCycleAtom) || 36}s linear infinite;
     animation-play-state: paused;
 }
-                ` : '', storedCircleCoverAtom == "true" && storedCenterHoleAtom == "true" ? `
+                `)
+                consoleLog("INFO", "set", "专辑旋转封面");
+
+                if (storedCenterHoleAtom == "true")
+                    innerHTML.push(`
 div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
     mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15.25%, #FFFFFF77 20%, black 20.25%, black 68%, #FFFFFFAA 68.25%);
 }
@@ -275,16 +289,12 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
     opacity: .5;
     z-index: 1;
 }
-                ` : ''].join('\n')
-            consoleLog("INFO", "set", "专辑透明底");
-            if (storedCircleCoverAtom == "true")
-                consoleLog("INFO", "set", "专辑圆形封面");
-            if (storedRotaryCoverAtom == "true")
-                consoleLog("INFO", "set", "专辑旋转封面");
-            if (storedCenterHoleAtom == "true")
+                `)
                 consoleLog("INFO", "set", "专辑仿真镂空");
+            }
+
+            styleElement.innerHTML = innerHTML.join('\n');
         }
-    }, []);
 
     const [musicPlaying, setMusicPlaying] = useAtom<boolean>(extensionContext.amllStates.musicPlayingAtom);
     useEffect(() => {
@@ -297,7 +307,7 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
             }
             styleElement.id = 'music_playing';  // 设置 id
             styleElement.innerHTML = `
-#amll-lyric-player div[class*="_coverInner"] > div[class*="_coverInner"] {
+#amll-lyric-player div[class*="_coverInner"] > div[class*="_coverInner"], button[class*="_coverButton"] {
     /* 旋转动画 */
     animation-play-state: running;
 }

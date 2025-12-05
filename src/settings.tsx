@@ -4,7 +4,7 @@ import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
 import {TextProps, Text, Flex, Switch, Card, Separator, TextField, Slider} from "@radix-ui/themes";
 const x = () => {
-  
+
 }
 const WARN_TAG = chalk.bgHex("#de2a18").hex("#FFFFFF")(" WARN ");
 const INFO_TAG = chalk.bgHex("#2376b7").hex("#FFFFFF")(" INFO ");
@@ -224,19 +224,29 @@ div[class*="_lyricDuetLine"] div[class*="_romanWord"] {
                     document.head.appendChild(styleElement);
                 }
                 styleElement.id = 'cover';  // 设置 id
-                styleElement.innerHTML = [`
+                let innerHTML: string[] = [];
+
+                innerHTML.push(`
 div[class*="_cover_"] {
     transform: perspective(0);
 }
-                
+
 div[class*="_coverInner"] {
     background-color: transparent !important;
 }
-                `, circle_cover ? `
-div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
+                `)
+                consoleLog("INFO", "set", "专辑透明底");
+
+                if (circle_cover) {
+                    innerHTML.push(`
+div[class*="_coverInner"]:has(> div[class*="_coverInner"]), button[class*="_coverButton"], button[class*="_coverButton"]::before, img.rt-AvatarImage {
     border-radius: 50% !important;
+    overflow: hidden;
 }
-                ` : '', circle_cover && rotary_cover ? `
+                `)
+
+                    if (rotary_cover)
+                        innerHTML.push(`
 /* 关键帧定义 */
 @keyframes rotate {
     0% {
@@ -247,11 +257,14 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
     }
 }
 
-div[class*="_coverInner"] > div[class*="_coverInner"] {
+div[class*="_coverInner"] > div[class*="_coverInner"], button[class*="_coverButton"] {
     animation: rotate ${parseFloat(rotary_cycle) || 36}s linear infinite;
     animation-play-state: paused;
 }
-                ` : '', circle_cover && center_hole ? `
+                `)
+
+                    if (center_hole)
+                        innerHTML.push(`
 div[class*="_coverInner"]:has(> div[class*="_coverInner"]) {
     mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15.25%, #FFFFFF77 20%, black 20.25%, black 68%, #FFFFFFAA 68.25%);
 }
@@ -266,7 +279,10 @@ div[class*="_coverInner"]:has(> div[class*="_coverInner"])::before {
     opacity: .5;
     z-index: 1;
 }
-                ` : ''].join("\n")
+                `)
+                }
+
+                styleElement.innerHTML = innerHTML.join('\n');
             } else {
                 if (styleElement) {
                     document.head.removeChild(styleElement);
@@ -372,7 +388,7 @@ div[class*="_lyricMainLine"]:has(div[class*="_romanWord"]) span[style^="mask-ima
         }]
     })()
 
-    const setAmllPartPercentFunc = (percent:number) => {
+    function setAmllPartPercentFunc(percent:number) {
         setAmllPartPercent(percent);
 
         consoleLog("INFO", "context", "AmllPartPercentAtomAtom: " + percent);
@@ -567,7 +583,7 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
                             onCheckedChange={(e) => setAmllCircleCoverFunc(e)}/>
                 </Flex>
                 : null}
-            {amllCircleCover ?
+            {amllTransCover && amllCircleCover ?
                 <Flex direction="row" align="center" gap="4" my="2">
                     <Flex direction="column" flexGrow="1">
                         <Text as="div">旋转封面</Text>
@@ -576,7 +592,7 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
                             onCheckedChange={(e) => setAmllRotaryCoverFunc(e)}/>
                 </Flex>
                 : null}
-            {amllCircleCover ?
+            {amllTransCover && amllCircleCover ?
                 <Flex direction="row" align="center" gap="4" my="2">
                     <Flex direction="column" flexGrow="1">
                         <Text as="div">仿真挖孔</Text>
@@ -585,7 +601,7 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
                             onCheckedChange={(e) => setAmllCenterHoleFunc(e)}/>
                 </Flex>
                 : null}
-            {amllCircleCover ?
+            {amllTransCover && amllCircleCover && amllRotaryCover ?
                 <Flex direction="row" align="center" gap="4" my="2">
                     <Flex direction="column" flexGrow="1">
                         <Text as="div">旋转周期</Text>
