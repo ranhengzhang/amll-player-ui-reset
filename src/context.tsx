@@ -331,5 +331,32 @@ div[class*="_lyricPage"] > div[class*="_horizontalLayout"] {
         consoleLog("INFO", "set", `专辑信息和歌词部分占比 ${Number(storedPartPercentAtom)}:${100-Number(storedPartPercentAtom)}`);
     }
 
+    const storedExtraInfoAtom = localStorage.getItem('amllExtraInfoAtom');
+    consoleLog('INFO', 'context', "storedExtraInfoAtom: " + storedExtraInfoAtom);
+    if (storedExtraInfoAtom) {
+        const storedExtraInfo = storedExtraInfoAtom?.replace(/^"/g, '').replace(/"$/g, '');
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('extra_info');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'extra_info';  // 设置 id
+        styleElement.innerHTML = `
+div.amll-lyric-player > div[class*="_lyricLine"]:empty {
+    transition: transform 0.25s;
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: 0px 87.7188px;
+    mask: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2));
+}
+
+div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
+    content: "${storedExtraInfo}";
+}
+            `
+        consoleLog("INFO", "set", `额外信息 ${storedExtraInfo}`);
+    }
+
     return null;
 }

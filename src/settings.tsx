@@ -50,6 +50,7 @@ export const SettingPage: FC = () => {
     const [amllSwapped, setAmllSwapped] = useAtom(enableLyricSwapTransRomanLineAtom)
     const [amllPartPercent, setAmllPartPercent] = useAtom(amllPartPercentAtom)
     const [amllPlayBar, setAmllPlayBar] = useAtom(amllPlayBarAtom)
+    const [amllExtraInfo, setAmllExtraInfo] = useAtom(amllExtraInfoAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -415,6 +416,38 @@ div[class*="_playbar"] {
         }
     }
 
+    function setAmllExtraInfoFunc(info:string) {
+        setAmllExtraInfo(info);
+        consoleLog("INFO", "context", "AmllExtraInfoAtom: " + info);
+        let styleElement = document.getElementById('extra_info');
+        if (info) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'extra_info';  // 设置 id
+            styleElement.innerHTML = `
+div.amll-lyric-player > div[class*="_lyricLine"]:empty {
+    transition: transform 0.25s;
+    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: 0px 87.7188px;
+    mask: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2));
+}
+
+div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
+    content: "${info}";
+}
+            `
+            consoleLog("INFO", "extend", "额外专辑信息");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+                consoleLog("INFO", "extend", "取消额外专辑信息");
+            }
+        }
+    }
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
@@ -498,6 +531,13 @@ div[class*="_playbar"] {
                             onCheckedChange={(e) => setAmllTopRomanFunc(e)}/>
                 </Flex>
                 : null}
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">歌词页额外信息</Text>
+                </Flex>
+                <TextField.Root value={amllExtraInfo}
+                                onChange={(e) => setAmllExtraInfoFunc(e.currentTarget.value)}/>
+            </Flex>
         </Card>
         <SubTitle>额外兼容</SubTitle>
         <Card mt="2">
@@ -637,4 +677,9 @@ export const amllPartPercentAtom = atomWithStorage(
 export const amllPlayBarAtom = atomWithStorage(
     "amllPlayBarAtom",
     false
+)
+
+export const amllExtraInfoAtom = atomWithStorage(
+    "amllExtraInfoAtom",
+    ""
 )
