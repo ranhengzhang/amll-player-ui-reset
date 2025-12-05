@@ -48,6 +48,26 @@ div.amll-lyric-player.dom rt {
             consoleLog("INFO", "extend", "Ruby兼容开启");
         }
 
+        const storedPlayBarAtom = localStorage.getItem('amllPlayBarAtom');
+        consoleLog('INFO', 'context', "storedPlayBarAtom: " + storedPlayBarAtom);
+        if (storedPlayBarAtom == "true") {
+            // 创建一个 <style> 标签，并为其设置 id
+            let styleElement = document.getElementById('play_bar');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'play_bar';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_playbar"] {
+    z-index: 9999;
+    background-color: white;
+}
+        `
+            consoleLog("INFO", "extend", "播放条置顶");
+        }
+
         const storedBgPaddingAtom = localStorage.getItem('amllBgPaddingAtom');
         consoleLog('INFO', 'context', "storedBgPaddingAtom: " + storedBgPaddingAtom);
         if (storedBgPaddingAtom == "true") {

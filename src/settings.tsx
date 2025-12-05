@@ -49,6 +49,7 @@ export const SettingPage: FC = () => {
     const [amllHideRoman, setAmllHideRoman] = useAtom(amllHideRomanAtom)
     const [amllSwapped, setAmllSwapped] = useAtom(enableLyricSwapTransRomanLineAtom)
     const [amllPartPercent, setAmllPartPercent] = useAtom(amllPartPercentAtom)
+    const [amllPlayBar, setAmllPlayBar] = useAtom(amllPlayBarAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -383,6 +384,32 @@ div[class*="_lyricPage"] > div[class*="_horizontalLayout"] {
         `
     }
 
+    function setAmllPlayBarFunc(top:boolean) {
+        setAmllPlayBar(top);
+        consoleLog("INFO", "context", "AmllPlayBarAtom: " + top);
+        let styleElement = document.getElementById('play_bar');
+        if (top) {
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'play_bar';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_playbar"] {
+    z-index: 9999;
+    background-color: white;
+}
+        `
+            consoleLog("INFO", "extend", "播放条置顶");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+                consoleLog("INFO", "extend", "播放条取消置顶");
+            }
+        }
+    }
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
@@ -405,6 +432,13 @@ div[class*="_lyricPage"] > div[class*="_horizontalLayout"] {
                 </Flex>
                 <Switch checked={amllAmbiguousControl}
                         onCheckedChange={(e) => setAmllAmbiguousControlFunc(e)}/>
+            </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">播放条置顶</Text>
+                </Flex>
+                <Switch checked={amllPlayBar}
+                        onCheckedChange={(e) => setAmllPlayBarFunc(e)}/>
             </Flex>
             <Separator my="3" size="4" />
             <Flex direction="row" align="center" gap="4" my="2">
@@ -593,4 +627,9 @@ export const enableLyricSwapTransRomanLineAtom = atomWithStorage(
 export const amllPartPercentAtom = atomWithStorage(
     "amllPartPercentAtom",
     45
+)
+
+export const amllPlayBarAtom = atomWithStorage(
+    "amllPlayBarAtom",
+    false
 )
