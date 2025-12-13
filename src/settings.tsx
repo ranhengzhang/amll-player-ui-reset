@@ -3,6 +3,7 @@ import {atomWithStorage} from "jotai/utils";
 import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
 import {TextProps, Text, Flex, Switch, Card, Separator, TextField, Slider} from "@radix-ui/themes";
+import {amllFixStyleAtom} from "./context";
 const x = () => {
 
 }
@@ -51,6 +52,7 @@ export const SettingPage: FC = () => {
     const [amllPartPercent, setAmllPartPercent] = useAtom(amllPartPercentAtom)
     const [amllPlayBar, setAmllPlayBar] = useAtom(amllPlayBarAtom)
     const [amllExtraInfo, setAmllExtraInfo] = useAtom(amllExtraInfoAtom)
+    const [amllFixStyle, setAmllFixStyle] = useAtom(amllFixStyleAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -464,6 +466,15 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
         }
     }
 
+    function setAmllFixStyleFunc(fix:boolean) {
+        setAmllFixStyle(fix);
+        consoleLog("INFO", "context", "AmllFixStyleAtom: " + fix);
+        if (fix)
+            consoleLog("INFO", "extend", "修复样式丢失");
+        else
+            consoleLog("INFO", "extend", "取消修复样式丢失");
+    }
+
     useEffect(() => {
         console.log("SettingPage Loaded");
     }, []);
@@ -486,6 +497,13 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
                 </Flex>
                 <Switch checked={amllAmbiguousControl}
                         onCheckedChange={(e) => setAmllAmbiguousControlFunc(e)}/>
+            </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">修复「取消弹簧动画」时样式丢失<br/>(解决方法来自 Linho1219)</Text>
+                </Flex>
+                <Switch checked={amllFixStyle}
+                        onCheckedChange={(e) => setAmllFixStyleFunc(e)}/>
             </Flex>
             <Flex direction="row" align="center" gap="4" my="2">
                 <Flex direction="column" flexGrow="1">

@@ -1,6 +1,7 @@
 import { useEffect, type FC } from "react";
-import { consoleLog } from "./settings";
+import {consoleLog} from "./settings";
 import {useAtom} from "jotai";
+import {atomWithStorage} from "jotai/utils";
 
 export const ExtensionContext: FC = () => {
     useEffect(() => {
@@ -368,5 +369,37 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
         consoleLog("INFO", "set", `额外信息 ${storedExtraInfo}`);
     }
 
+    const [amllFixStyle, setAmllFixStyle] = useAtom(amllFixStyleAtom)
+    useEffect(() => {
+        if (amllFixStyle) {
+            let styleElement = document.getElementById('fix_style');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'fix_style';  // 设置 id
+            styleElement.innerHTML = `
+.amll-lyric-player.dom {
+    line-height: 1.5;
+    --bright-mask-alpha: 1;
+    --dark-mask-alpha: 0.4;
+    --amll-lp-color: light-dark(var(--p-neutral-800), var(--p-neutral-100));
+    --amll-lp-hover-bg-color: color-mix(in srgb, var(--amll-lp-color), transparent 95%);
+}
+            `
+        } else {
+            let styleElement = document.getElementById('fix_style');
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+        }
+    }, [amllFixStyle]);
+
     return null;
 }
+
+export const amllFixStyleAtom = atomWithStorage(
+    "amllFixStyleAtom",
+    false
+)
