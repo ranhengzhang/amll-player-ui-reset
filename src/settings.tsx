@@ -2,11 +2,9 @@ import { atom, useAtom } from "jotai";
 import {atomWithStorage} from "jotai/utils";
 import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
-import {TextProps, Text, Flex, Switch, Card, Separator, TextField, Slider} from "@radix-ui/themes";
+import {TextProps, Text, Flex, Switch, Card, Separator, TextField, Slider, TextArea} from "@radix-ui/themes";
 import {amllFixStyleAtom} from "./context";
-const x = () => {
 
-}
 const WARN_TAG = chalk.bgHex("#de2a18").hex("#FFFFFF")(" WARN ");
 const INFO_TAG = chalk.bgHex("#2376b7").hex("#FFFFFF")(" INFO ");
 const  LOG_TAG = chalk.bgHex("#1ba784").hex("#FFFFFF")(" LOG ");
@@ -53,6 +51,9 @@ export const SettingPage: FC = () => {
     const [amllPlayBar, setAmllPlayBar] = useAtom(amllPlayBarAtom)
     const [amllExtraInfo, setAmllExtraInfo] = useAtom(amllExtraInfoAtom)
     const [amllFixStyle, setAmllFixStyle] = useAtom(amllFixStyleAtom)
+    const [amllUserCss, setAmllUserCss] = useAtom(amllUserCssAtom)
+    const [amllLyricMode, setAmllLyricMode] = useAtom(amllLyricModeAtom)
+    const [amllAlignCenter, setAmllAlignCenter] = useAtom(amllAlignCenterAtom)
 
     function setAmllRubyUsedFunc(used: boolean) {
         setAmllRubyUsed(used);
@@ -451,6 +452,7 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty {
     transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform-origin: 0px 87.7188px;
     mask: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2));
+    font-size: 0.8em;
 }
 
 div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
@@ -511,6 +513,20 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
                 </Flex>
                 <Switch checked={amllPlayBar}
                         onCheckedChange={(e) => setAmllPlayBarFunc(e)}/>
+            </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">纯歌词模式</Text>
+                </Flex>
+                <Switch checked={amllLyricMode}
+                        onCheckedChange={(e) => setAmllLyricMode(e)}/>
+            </Flex>
+            <Flex direction="row" align="center" gap="4" my="2">
+                <Flex direction="column" flexGrow="1">
+                    <Text as="div">没有对唱时居中对齐</Text>
+                </Flex>
+                <Switch checked={amllAlignCenter}
+                        onCheckedChange={(e) => setAmllAlignCenter(e)}/>
             </Flex>
             <Separator my="3" size="4" />
             <Flex direction="row" align="center" gap="4" my="2">
@@ -630,6 +646,10 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
                 </Flex>
                 : null}
         </Card>
+        <Card mt="2">
+            <TextArea resize="vertical" value={amllUserCss} placeholder="请输入自定义CSS"
+                      onChange={(e) => setAmllUserCss(e.currentTarget.value)}/>
+        </Card>
     </div>
 }
 
@@ -716,4 +736,19 @@ export const amllPlayBarAtom = atomWithStorage(
 export const amllExtraInfoAtom = atomWithStorage(
     "amllExtraInfoAtom",
     ""
+)
+
+export const amllUserCssAtom = atomWithStorage(
+    "amllUserCssAtom",
+    ""
+)
+
+export const amllLyricModeAtom = atomWithStorage(
+    "amllLyricModeAtom",
+    false
+)
+
+export const amllAlignCenterAtom = atomWithStorage(
+    "amllAlignCenterAtom",
+    false
 )

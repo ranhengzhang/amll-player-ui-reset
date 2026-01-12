@@ -1,5 +1,5 @@
 import { useEffect, type FC } from "react";
-import {consoleLog} from "./settings";
+import {amllAlignCenterAtom, amllLyricModeAtom, amllUserCssAtom, consoleLog} from "./settings";
 import {useAtom} from "jotai";
 import {atomWithStorage} from "jotai/utils";
 
@@ -360,6 +360,7 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty {
     transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     transform-origin: 0px 87.7188px;
     mask: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2));
+    font-size: 0.8em;
 }
 
 div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
@@ -395,6 +396,110 @@ div.amll-lyric-player > div[class*="_lyricLine"]:empty::before {
             }
         }
     }, [amllFixStyle]);
+
+    const [amllUserCss, setAmllUserCss] = useAtom(amllUserCssAtom)
+    let cssTimer = null
+    useEffect(() => {
+        if (cssTimer) {
+            // stop
+            clearTimeout(cssTimer);
+            cssTimer = null;
+        }
+        cssTimer = setTimeout(()=>{
+            consoleLog("INFO", "context", "AmllUserCssAtom: " + amllUserCss);
+            let styleElement = document.getElementById('user_css');
+            if (amllUserCss) {
+                if (!styleElement) {
+                    styleElement = document.createElement('style');
+                    // 将 <style> 标签添加到 head 中
+                    document.head.appendChild(styleElement);
+                }
+                styleElement.id = 'user_css';  // 设置 id
+                styleElement.innerHTML = amllUserCss;
+                consoleLog("INFO", "extend", "自定义样式");
+            } else {
+                if (styleElement) {
+                    document.head.removeChild(styleElement);
+                }
+                consoleLog("INFO", "extend", "取消自定义样式");
+            }
+        }, 1000);
+    }, [amllUserCss]);
+
+    const [amllLyricMode, setAmllLyricMode] = useAtom(amllLyricModeAtom)
+    const [amllAlignCenter, setAmllAlignCenter] = useAtom(amllAlignCenterAtom)
+    useEffect(() => {
+        if (amllLyricMode) {
+            let styleElement = document.getElementById('lyric_mode');
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                // 将 <style> 标签添加到 head 中
+                document.head.appendChild(styleElement);
+            }
+            styleElement.id = 'lyric_mode';  // 设置 id
+            styleElement.innerHTML = `
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) {
+    grid-template-columns: 5vw [player-side info-side]1fr 5vw;
+    grid-template-rows: [drag-area]30px [thumb]auto [info-side]3fr [music-info]1fr [bottom-controls]0fr 10px;
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_cover"] {
+    display: none;
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_thumb"] {
+    margin: none;
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_lyric"] {
+    grid-area: 3/player-side/3;
+    padding-right: 0;
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_controls"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    width: 95%;
+    margin-top: 0;
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_controls"] > div {
+    order: 1;
+    flex-basis: 100%;
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_controls"] > div[class*="_musicInfo"] {
+    order: 3;
+    flex-basis: min(45%,400px);
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_controls"] > div[class*="_controls"] {
+    order: 2;
+    flex-basis: min(45%,400px);
+}
+
+div[class*="_lyricPage"] > div[class*="_horizontalLayout"]:not([class*="_hideLyric"]) > div[class*="_bottomControls"] {
+    grid-area: bottom-controls/1/bottom-controls/4;
+}
+${ amllAlignCenter ? `
+div.amll-lyric-player.dom:not([class*="_hasDuetLine"]) {
+    text-align: center;
+}
+
+div.amll-lyric-player.dom:not([class*="_hasDuetLine"]) > div[class*="_lyricLine"] {
+    text-align: center;
+    transform-origin: center;
+}
+` : '' }
+            `
+        } else {
+            let styleElement = document.getElementById('lyric_mode');
+            if (styleElement) {
+                document.head.removeChild(styleElement);
+            }
+        }
+    }, [amllLyricMode, amllAlignCenter]);
 
     return null;
 }
