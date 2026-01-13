@@ -491,6 +491,17 @@ div.amll-lyric-player.dom:not([class*="_hasDuetLine"]) > div[class*="_lyricLine"
     text-align: center;
     transform-origin: center;
 }
+
+div.amll-lyric-player.dom:not([class*="_hasDuetLine"]) > div[class*="_interludeDots"] {
+    left: 0;
+     right: 0;
+      margin: auto;
+}
+
+div.amll-lyric-player.dom:not([class*="_hasDuetLine"]) div[class*="_romanWord"] {
+    margin-right: 0.25em;
+    margin-left: 0.25em;
+}
 ` : '' }
             `
         } else {
