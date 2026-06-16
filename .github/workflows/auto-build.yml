@@ -5,6 +5,7 @@ on:
        - '.github/workflows/auto-build.yml'
        - 'src/**'
        - 'package.json'
+  workflow_dispatch:
 
 jobs:
   build-release:
