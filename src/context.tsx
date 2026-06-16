@@ -513,6 +513,10 @@ div.amll-lyric-player.dom:not([class*="hasDuetLine"]) {
             consoleLog("INFO", "extend", "绑定歌词容器");
 
             const handleMouseEnter = () => {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
                 if (!isMounted) return;
                 layout.className = (layout.className + ' hover').trim();
             };
@@ -523,7 +527,10 @@ div.amll-lyric-player.dom:not([class*="hasDuetLine"]) {
                 // e.relatedTarget 是鼠标移向的元素
                 // 如果鼠标移向了 lyric 外部（或 null），才执行延迟
                 if (!layout.contains(e.relatedTarget)) {
-                    if (timer) clearTimeout(timer);
+                    if (timer) {
+                        clearTimeout(timer);
+                        timer = null;
+                    }
                     timer = setTimeout(() => {
                         let classList = layout.className.split(" ");
                         layout.className = classList.filter(item => item !== "hover").join(" ");
