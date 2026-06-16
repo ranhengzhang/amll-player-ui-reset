@@ -1,0 +1,3 @@
+onlyBuiltDependencies:
+  - esbuild
+  - "@applemusic-like-lyrics/lyric"
