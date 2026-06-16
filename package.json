@@ -33,5 +33,11 @@
   },
   "dependencies": {
     "chalk": "^5.4.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@applemusic-like-lyrics/lyric"
+    ]
   }
 }
