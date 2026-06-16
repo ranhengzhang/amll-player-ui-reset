@@ -950,7 +950,7 @@ packages:
     engines: {node: '>=10'}
 
   chalk@5.4.1:
-    resolution: {integrity: sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==, tarball: https://registry.npmmirror.com/chalk/-/chalk-5.4.1.tgz}
+    resolution: {integrity: sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==, tarball: https://registry.npmjs.org/chalk/-/chalk-5.4.1.tgz}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   classnames@2.3.2:
