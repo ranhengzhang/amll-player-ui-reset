@@ -475,19 +475,23 @@ div.amll-lyric-player > div[class*="lyricLine"][class*="bottomLine"]{
             if (amllLyricMode) {
                 cssContent.push(`
 div[class*="lyricPage"] > div#amll-lyric-player  > div[class*="horizontalLayout"]:not([class*="hideLyric"]) {
-    grid-template-columns: [margin-left]0 [padding-left]20vw [player-side]1fr [padding-right info-side]20vw [margin-right]0;
+    grid-template-columns: [cover-side]20vw [player-side]1fr [margin]5vw;
     grid-template-rows: [drag-area]30px [thumb]auto [info-side]3fr [music-info]0fr [bottom-controls]0fr 10px;
 
     &.hover {
-        grid-template-columns: [margin-left]20vw [padding-left]0 [player-side]1fr [padding-right]0 [margin-right info-side]20vw;
         grid-template-rows: [drag-area]30px [thumb]auto [info-side]3fr [music-info]1fr [bottom-controls]0fr 10px;
+
+        div[class*="controls"] > div[class*="controls"],
+        div[class*="controls"] > div[class*="musicInfo"] {
+            opacity: 1;
+        }
     }
 
     & > div[class*="cover"] {
-        grid-area: 1/margin-left/-1/player-side;
+        grid-area: 1/cover-side/-1/player-side;
         transform: translateX(-25%);
-        width: calc(var(--horizontal-layout-max-width)*1.5);
-        height: calc(var(--horizontal-layout-max-width)*1.5);
+        width: calc(var(--horizontal-layout-max-width)*1.25);
+        height: calc(var(--horizontal-layout-max-width)*1.25);
     }
     
     & > div[class*="thumb"] {
@@ -501,12 +505,12 @@ div[class*="lyricPage"] > div#amll-lyric-player  > div[class*="horizontalLayout"
     }
     
     & > div[class*="controls"] {
+        grid-area: music-info/player-side/bottom-controls/margin;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-around;
         width: 95%;
         margin-top: 0;
-        grid-area: music-info/padding-left/bottom-controls/margin-right;
     
         & > div {
             order: 1;
@@ -514,21 +518,22 @@ div[class*="lyricPage"] > div#amll-lyric-player  > div[class*="horizontalLayout"
         }
         
         & > div[class*="musicInfo"] {
+            opacity: 0;
             order: 3;
             flex-basis: min(45%,400px);
+            transition: opacity 0.3s ease-out;
         }
     
         & > div[class*="controls"] {
+            opacity: 0;
             order: 2;
             flex-basis: min(45%,400px);
+            transition: opacity 0.3s ease-out;
         }
     }
     
     & > div[class*="bottomControls"] {
-        grid-area: drag-area/padding-right/bottom-controls/-1;
-        flex-direction: column-reverse;
-        align-items: flex-end;
-        padding: 4em;
+        opacity: 0;
     }
 }`);
             }
