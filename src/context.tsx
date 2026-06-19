@@ -1,5 +1,22 @@
 import {useEffect, type FC} from "react";
-import {amllAlignCenterAtom, amllExtraInfoAtom, amllLyricModeAtom, amllUserCssAtom, consoleLog} from "./settings";
+import {
+    consoleLog,
+    amllAlignCenterAtom,
+    amllExtraInfoAtom,
+    amllLyricModeAtom,
+    amllUserCssAtom,
+    amllPlayBarAtom,
+    amllAmbiguousControlAtom,
+    amllFixControlAtom,
+    amllRomaGapAtom,
+    amllHideRomanAtom,
+    amllTransCoverAtom,
+    amllCircleCoverAtom,
+    amllRotaryCoverAtom,
+    amllCenterHoleAtom,
+    amllRotaryCycleAtom,
+    amllPartPercentAtom, amllFixStyleAtom,
+} from "./settings";
 import {useAtom} from "jotai";
 import {atomWithStorage} from "jotai/utils";
 
@@ -19,18 +36,19 @@ export const ExtensionContext: FC = () => {
         return () => val;
     })(storedLyricSwappedAtom);
 
-    const storedPlayBarAtom = localStorage.getItem('amllPlayBarAtom');
+    const [amllPlayBar, setAmllPlayBar] = useAtom(amllPlayBarAtom);
     useEffect(() => {
-        consoleLog('INFO', 'context', "storedPlayBarAtom: " + storedPlayBarAtom);
-        if (storedPlayBarAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('play_bar');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
-            }
-            styleElement.id = 'play_bar';  // 设置 id
+        consoleLog('INFO', 'context', "amllPlayBar: " + amllPlayBar);
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('play_bar');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'play_bar';  // 设置 id
+            
+        if (amllPlayBar) {
             styleElement.innerHTML = `
 div[class*="playbar"] {
     z-index: 9999;
@@ -38,21 +56,27 @@ div[class*="playbar"] {
 }
         `
             consoleLog("INFO", "extend", "播放条置顶");
-        }
-    }, [storedPlayBarAtom]);
-
-    const storedAmbiguousControlAtom = localStorage.getItem('amllAmbiguousControlAtom');
-    useEffect(() => {
-        consoleLog('INFO', 'context', "storedAmbiguousControlAtom: " + storedAmbiguousControlAtom);
-        if (storedAmbiguousControlAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('ctrl_bar');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
             }
-            styleElement.id = 'ctrl_bar';  // 设置 id
+            consoleLog("INFO", "extend", "取消播放条置顶");
+        }
+    }, [amllPlayBar]);
+
+    const [amllAmbiguousControl, setAmllAmbiguousControl] = useAtom(amllAmbiguousControlAtom);
+    useEffect(() => {
+        consoleLog('INFO', 'context', "amllAmbiguousControl: " + amllAmbiguousControl);
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('ctrl_bar');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'ctrl_bar';  // 设置 id
+
+        if (amllAmbiguousControl) {
             styleElement.innerHTML = `
 div[class*="horizontalLayout"] > div[class*="controls"]:has(> div[class*="controls"]:empty) {
     justify-content: center;
@@ -64,43 +88,54 @@ div[class*="cover"]:has(+ div[class*="controls"] > div[class*="controls"]:empty)
 }
             `;
             consoleLog("INFO", "fix", "自动调整左半布局");
-        }
-    }, [storedAmbiguousControlAtom]);
-
-    const storedFixControlAtom = localStorage.getItem('amllFixControlAtom');
-    useEffect(() => {
-        consoleLog('INFO', 'context', "storedFixControlAtom: " + storedFixControlAtom);
-        if (storedFixControlAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('fix_control');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
             }
-            styleElement.id = 'fix_control';  // 设置 id
+            consoleLog("INFO", "fix", "取消自动调整左半布局");
+        }
+    }, [amllAmbiguousControl]);
+
+    const [amllFixControl, setAmllFixControl] = useAtom(amllFixControlAtom);
+    useEffect(() => {
+        consoleLog('INFO', 'context', "amllFixControl: " + amllFixControl);
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('fix_control');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'fix_control';  // 设置 id
+
+        if (amllFixControl) {
             styleElement.innerHTML = `
 div[class*="controlThumb"] > button {
-    position: relative;
-    left: 50%;
+    transform: translateX(-50%) translateY(-50%) !important;
 }
             `;
-            consoleLog("INFO", "fix", "修复关闭按钮定位");
-        }
-    }, [storedFixControlAtom]);
-
-    const storedRomaGapAtom = localStorage.getItem('amllRomaGapAtom');
-    useEffect(() => {
-        consoleLog('INFO', 'context', "storedRomaGapAtom: " + storedRomaGapAtom);
-        if (storedRomaGapAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('roma_gap');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
+            consoleLog("INFO", "fix", "固定关闭按钮定位");
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
             }
-            styleElement.id = 'roma_gap';  // 设置 id
+            consoleLog("INFO", "fix", "取消固定关闭按钮定位");
+        }
+    }, [amllFixControl]);
+
+    const [amllRomaGap, setAmllRomaGap] = useAtom(amllRomaGapAtom);
+    useEffect(() => {
+        consoleLog('INFO', 'context', "amllRomaGap: " + amllRomaGap);
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('roma_gap');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'roma_gap';  // 设置 id
+        
+        if (amllRomaGap) {
             styleElement.innerHTML = `
 div[class*="romanWord"] {
     margin-right: 0.25em;
@@ -112,90 +147,63 @@ div[class*="lyricDuetLine"] div[class*="romanWord"] {
 }
 `
             consoleLog("INFO", "fix", "调整逐字音译字间距");
-        }
-    }, [storedRomaGapAtom]);
-
-    const storedHideRomanAtom = localStorage.getItem('amllHideRomanAtom');
-    useEffect(() => {
-        consoleLog('INFO', 'context', "storedHideRomanAtom: " + storedHideRomanAtom);
-        if (storedHideRomanAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('hide_roman');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
             }
-            styleElement.id = 'hide_roman';  // 设置 id
+            consoleLog("INFO", "fix", "取消调整逐字音译字间距");
+        }
+    }, [amllRomaGap]);
+
+    const [amllHideRoman, setAmllHideRoman] = useAtom(amllHideRomanAtom);
+    useEffect(() => {
+        consoleLog('INFO', 'context', "amllHideRoman: " + amllHideRoman);
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('hide_roman');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'hide_roman';  // 设置 id
+        if (amllHideRoman) {
             styleElement.innerHTML = `
 div[class*="lyricLine"]:has( div[class*="romanWord"]) > div[class*="lyricSubLine"]:nth-child(${getSwapped() ? 2 : 3}) {
     display: none;
 }
             `
             consoleLog("INFO", "fix", "逐字音译时隐藏行音译");
-        }
-    }, [storedHideRomanAtom]);
-
-    const storedRomanWordAtom = localStorage.getItem('amllRomanWordAtom');
-    const storedTopRomanAtom = localStorage.getItem('amllTopRomanAtom');
-    useEffect(() => {
-        consoleLog('INFO', 'context', "storedRomanWordAtom: " + storedRomanWordAtom);
-        consoleLog('INFO', 'context', "storedTopRomanAtom: " + storedTopRomanAtom);
-        if (storedRomanWordAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('roman_word');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
+        } else {
+            if (styleElement) {
+                document.head.removeChild(styleElement);
             }
-            styleElement.id = 'roman_word';  // 设置 id
-            styleElement.innerHTML = [`
-div[class*="lyricMainLine"]:has( div[class*="romanWord"]) span[style^="mask-image"] {
-    display: inline-flex;
-    flex-wrap: wrap;
-    flex-direction: ${storedTopRomanAtom == "true" ? "column-reverse" : "column"};
-}
-
-div[class*="lyricMainLine"] span[style^="mask-image"] > span {
-    display: contents;
-}
-            `, storedTopRomanAtom == "true" ? `
-div[class*="lyricMainLine"]:has(div[class*="romanWord"]) span[style^="mask-image"]:not(:has(> div[class*="romanWord"]))::after {
-    content: " ";
-    display: block;
-    font-size: .5em;
-    line-height: 1.25em;
-}
-                ` : ""].join("\n");
-            consoleLog("INFO", "fix", "修复无音译音节下沉");
-            if (storedTopRomanAtom == "true")
-                consoleLog("INFO", "fix", "音译音节居上");
+            consoleLog("INFO", "fix", "取消逐字音译时隐藏行音译");
         }
-    }, [storedRomanWordAtom, storedTopRomanAtom]);
+    }, [amllHideRoman]);
 
-    const storedTransCoverAtom = localStorage.getItem('amllTransCoverAtom');
-    const storedCircleCoverAtom = localStorage.getItem('amllCircleCoverAtom');
-    const storedRotaryCoverAtom = localStorage.getItem('amllRotaryCoverAtom');
-    const storedCenterHoleAtom = localStorage.getItem('amllCenterHoleAtom');
-    const storedRotaryCycleAtom = localStorage.getItem('amllRotaryCycleAtom');
+    const [amllTransCover, setAmllTransCover] = useAtom(amllTransCoverAtom);
+    const [amllCircleCover, setAmllCircleCover] = useAtom(amllCircleCoverAtom);
+    const [amllRotaryCover, setAmllRotaryCover] = useAtom(amllRotaryCoverAtom);
+    const [amllCenterHole, setAmllCenterHole] = useAtom(amllCenterHoleAtom);
+    const [amllRotaryCycle, setAmllRotaryCycle] = useAtom(amllRotaryCycleAtom);
     useEffect(() => {
-        consoleLog('INFO', 'context', "storedTransCoverAtom: " + storedTransCoverAtom);
-        consoleLog('INFO', 'context', "storedCircleCoverAtom: " + storedCircleCoverAtom);
-        consoleLog('INFO', 'context', "storedRotaryCoverAtom: " + storedRotaryCoverAtom);
-        consoleLog('INFO', 'context', "storedCenterHoleAtom: " + storedCenterHoleAtom);
-        consoleLog('INFO', 'context', "storedRotaryCycleAtom: " + storedRotaryCycleAtom);
-        if (storedTransCoverAtom == "true") {
-            // 创建一个 <style> 标签，并为其设置 id
-            let styleElement = document.getElementById('cover');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
-            }
-            styleElement.id = 'cover';  // 设置 id
-            let innerHTML: string[] = [];
+        consoleLog('INFO', 'context', "amllTransCover: " + amllTransCover);
+        consoleLog('INFO', 'context', "amllCircleCover: " + amllCircleCover);
+        consoleLog('INFO', 'context', "amllRotaryCover: " + amllRotaryCover);
+        consoleLog('INFO', 'context', "amllCenterHole: " + amllCenterHole);
+        consoleLog('INFO', 'context', "amllRotaryCycle: " + amllRotaryCycle);
+        
+        // 创建一个 <style> 标签，并为其设置 id
+        let styleElement = document.getElementById('cover');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'cover';  // 设置 id
+        let innerHTML: string[] = [];
 
+        if (amllTransCover) {
             innerHTML.push(`
 div[class*="cover"] {
     transform: perspective(0);
@@ -207,7 +215,7 @@ div[class*="coverInner"] {
                 `)
             consoleLog("INFO", "set", "专辑透明底");
 
-            if (storedCircleCoverAtom == "true") {
+            if (amllCircleCover) {
                 innerHTML.push(`
 div[class*="coverInner"]:has(> div[class*="coverInner"]), button[class*="coverButton"], button[class*="coverButton"]::before, img.rt-AvatarImage {
     border-radius: 50% !important;
@@ -216,7 +224,7 @@ div[class*="coverInner"]:has(> div[class*="coverInner"]), button[class*="coverBu
                 `)
                 consoleLog("INFO", "set", "专辑圆形封面");
 
-                if (storedRotaryCoverAtom == "true")
+                if (amllRotaryCover)
                     innerHTML.push(`
 /* 关键帧定义 */
 @keyframes rotate {
@@ -229,13 +237,13 @@ div[class*="coverInner"]:has(> div[class*="coverInner"]), button[class*="coverBu
 }
 
 div[class*="coverInner"] > div[class*="coverInner"], button[class*="coverButton"] {
-    animation: rotate ${parseFloat(storedRotaryCycleAtom) || 36}s linear infinite;
+    animation: rotate ${parseFloat(amllRotaryCycle) || 36}s linear infinite;
     animation-play-state: paused;
 }
                 `)
                 consoleLog("INFO", "set", "专辑旋转封面");
 
-                if (storedCenterHoleAtom == "true")
+                if (amllCenterHole)
                     innerHTML.push(`
 div[class*="coverInner"]:has(> div[class*="coverInner"]) {
     mask: radial-gradient(circle, transparent 15%, #FFFFFF77 15.25%, #FFFFFF77 20%, black 20.25%, black 68%, #FFFFFFAA 68.25%);
@@ -254,10 +262,10 @@ div[class*="coverInner"]:has(> div[class*="coverInner"])::before {
                 `)
                 consoleLog("INFO", "set", "专辑仿真镂空");
             }
-
-            styleElement.innerHTML = innerHTML.join('\n');
         }
-    }, [storedTransCoverAtom, storedCircleCoverAtom, storedRotaryCoverAtom, storedCenterHoleAtom, storedRotaryCycleAtom]);
+
+        styleElement.innerHTML = innerHTML.join('\n');
+    }, [amllTransCover, amllCircleCover, amllRotaryCover, amllCenterHole, amllRotaryCycle]);
 
     const [musicPlaying, setMusicPlaying] = useAtom<boolean>(extensionContext.amllStates.musicPlayingAtom);
     useEffect(() => {
@@ -285,67 +293,125 @@ div[class*="coverInner"]:has(> div[class*="coverInner"])::before {
         }
     }, [musicPlaying]);
 
-    const storedPartPercentAtom = localStorage.getItem('amllPartPercentAtom');
-    consoleLog('INFO', 'context', "storedPartPercentAtom: " + storedPartPercentAtom);
-    if (!isNaN(Number(storedPartPercentAtom))) {
-        // 创建一个 <style> 标签，并为其设置 id
-        let styleElement = document.getElementById('part_percent');
-        if (!styleElement) {
-            styleElement = document.createElement('style');
-            // 将 <style> 标签添加到 head 中
-            document.head.appendChild(styleElement);
+    const [amllPartPercent, setAmllPartPercent] = useAtom(amllPartPercentAtom);
+    consoleLog('INFO', 'context', "amllPartPercent: " + amllPartPercent);
+
+    // 1. 通过 id 找到基准元素
+    const baseElement = document.getElementById('amll-lyric-player');
+    if (!baseElement) return;
+
+    // 2. 在基准元素下查找目标节点
+    const target = baseElement.querySelector('div[class*="horizontalLayout"]');
+    if (!target) return;
+
+    // 3. 从浏览器的 CSSStyleSheet 中读取原始的 grid-template-columns
+    //    这里能拿到编译后的完整字符串，例如：
+    //    [-DaA0W_info-side] .45fr [-DaA0W_player-side] .55fr [-DaA0W_side-controls] 0fr
+    let originalGrid = '';
+    try {
+        for (const sheet of document.styleSheets) {
+            const rules = sheet.cssRules || sheet.rules;
+            for (const rule of rules) {
+                if (
+                    rule instanceof CSSStyleRule &&
+                    rule.selectorText.includes('horizontalLayout') &&
+                    rule.style.gridTemplateColumns
+                ) {
+                    originalGrid = rule.style.gridTemplateColumns;
+                    break;
+                }
+            }
+            if (originalGrid) break;
         }
-        styleElement.id = 'part_percent';  // 设置 id
-        styleElement.innerHTML = `
-div[class*="lyricPage"] > div[class*="horizontalLayout"] {
-    grid-template-columns: [info-side] .${Number(storedPartPercentAtom)}fr [player-side] .${100 - Number(storedPartPercentAtom)}fr [side-controls] 0fr;
-}
-        `
-        consoleLog("INFO", "set", `专辑信息和歌词部分占比 ${Number(storedPartPercentAtom)}:${100 - Number(storedPartPercentAtom)}`);
+    } catch (e) {
+        // 跨域样式表会抛出安全错误，此时忽略
+        console.warn('无法读取样式表，可能是跨域资源', e);
     }
 
-    const [amllExtraInfo, setAmllExtraInfo] = useAtom(amllExtraInfoAtom)
+    // 4. 提取其中带 Hash 的 [line-name]，例如 [-DaA0W_info-side]
+    const lineNames = originalGrid
+        ? [...originalGrid.matchAll(/\[[^\]]+\]/g)].map(m => m[0])
+        : [];
     useEffect(() => {
-        let styleElement = document.getElementById('extra_info');
-        if (amllExtraInfo) {
+        const percent = Number(amllPartPercent);
+        let newGridValue: string;
+
+        if (lineNames.length >= 3) {
+            // 使用读取到的真实带 Hash 的 Line Names 重新组装
+            newGridValue = `${lineNames[0]} ${percent}fr ${lineNames[1]} ${100 - percent}fr ${lineNames[2]} 0fr`;
+        } else {
+            // Fallback：如果因跨域等原因读不到样式表，退化为无 Hash 的写法
+            // 此时 grid-column: xxx 的引用可能会失效，但布局比例仍然正常
+            newGridValue = `[info-side] ${percent}fr [player-side] ${100 - percent}fr [side-controls] 0fr`;
+        }
+
+        if (!isNaN(Number(amllPartPercent))) {
+            // 创建一个 <style> 标签，并为其设置 id
+            let styleElement = document.getElementById('part_percent');
             if (!styleElement) {
                 styleElement = document.createElement('style');
                 // 将 <style> 标签添加到 head 中
                 document.head.appendChild(styleElement);
             }
-            styleElement.id = 'extra_info';  // 设置 id
-            styleElement.innerHTML = `
-div.amll-lyric-player > div[class*="lyricLine"]:empty {
-    transition: transform 0.25s;
-    transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform-origin: 0px 87.7188px;
-    mask: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2));
-    font-size: 0.8em;
-}
+            styleElement.id = 'part_percent';  // 设置 id
+            // 5. 直接设置到目标元素的内联样式上（推荐）
+            //    这样不需要担心选择器权重问题，也能确保覆盖编译后的 CSS Modules 样式
+            //         target.style.gridTemplateColumns = newGridValue;
 
-div.amll-lyric-player > div[class*="lyricLine"]:empty::before {
-    content: "${amllExtraInfo}";
+            // --- 如果你仍然坚持通过 styleElement 插入样式，可以用以下替代 ---
+            const selector = `div#amll-lyric-player > div[class*="horizontalLayout"]`;
+            styleElement.innerHTML = `
+            ${selector} {
+                grid-template-columns: ${newGridValue};
+            }
+            `;
+            consoleLog("INFO", "set", `专辑信息和歌词部分占比 ${Number(amllPartPercent)}:${100 - Number(amllPartPercent)}`);
+        }
+    }, [amllPartPercent]);
+
+    const [amllExtraInfo, setAmllExtraInfo] = useAtom(amllExtraInfoAtom)
+    useEffect(() => {
+        let styleElement = document.getElementById('extra_info');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'extra_info';  // 设置 id
+        if (amllExtraInfo) {
+            styleElement.innerHTML = `
+div.amll-lyric-player > div[class*="lyricLine"][class*="bottomLine"]{
+    &::after {
+        content: "${amllExtraInfo}";
+        font-size: max(max(2.4vh, 1.2vw), 10px);
+        opacity: .3;
+        transition: opacity .3s;
+    }
+    &[data-focused="true"]::after {
+        opacity: 1;
+    }
 }
             `
-            consoleLog("INFO", "extend", "额外专辑信息");
+            consoleLog("INFO", "extend", "额外歌曲信息");
         } else {
             if (styleElement) {
                 document.head.removeChild(styleElement);
-                consoleLog("INFO", "extend", "取消额外专辑信息");
+                consoleLog("INFO", "extend", "取消额外歌曲信息");
             }
         }
     }, [amllExtraInfo]);
 
     const [amllFixStyle, setAmllFixStyle] = useAtom(amllFixStyleAtom)
     useEffect(() => {
+        let styleElement = document.getElementById('fix_style');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'fix_style';  // 设置 id
+
         if (amllFixStyle) {
-            let styleElement = document.getElementById('fix_style');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
-            }
-            styleElement.id = 'fix_style';  // 设置 id
             styleElement.innerHTML = `
 .amll-lyric-player.dom {
     line-height: 1.5;
@@ -355,10 +421,11 @@ div.amll-lyric-player > div[class*="lyricLine"]:empty::before {
     --amll-lp-hover-bg-color: color-mix(in srgb, var(--amll-lp-color), transparent 95%);
 }
             `
+            consoleLog("INFO", "fix", "修复弹簧动画");
         } else {
-            let styleElement = document.getElementById('fix_style');
             if (styleElement) {
                 document.head.removeChild(styleElement);
+                consoleLog("INFO", "fix", "取消修复弹簧动画");
             }
         }
     }, [amllFixStyle]);
@@ -395,25 +462,29 @@ div.amll-lyric-player > div[class*="lyricLine"]:empty::before {
     const [amllLyricMode, setAmllLyricMode] = useAtom(amllLyricModeAtom)
     const [amllAlignCenter, setAmllAlignCenter] = useAtom(amllAlignCenterAtom)
     useEffect(() => {
-        if (amllLyricMode) {
-            let styleElement = document.getElementById('lyric_mode');
-            if (!styleElement) {
-                styleElement = document.createElement('style');
-                // 将 <style> 标签添加到 head 中
-                document.head.appendChild(styleElement);
-            }
-            styleElement.id = 'lyric_mode';  // 设置 id
-            styleElement.innerHTML = `
+        let styleElement = document.getElementById('lyric_mode');
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            // 将 <style> 标签添加到 head 中
+            document.head.appendChild(styleElement);
+        }
+        styleElement.id = 'lyric_mode';  // 设置 id
+        
+        let cssContent = [];
+        if (amllLyricMode || amllAlignCenter) {
+            if (amllLyricMode) {
+                cssContent.push(`
 div[class*="lyricPage"] > div#amll-lyric-player  > div[class*="horizontalLayout"]:not([class*="hideLyric"]) {
-    grid-template-columns: 20vw [player-side]1fr [info-side]20vw;
+    grid-template-columns: [margin-left]0 [padding-left]20vw [player-side]1fr [padding-right info-side]20vw [margin-right]0;
     grid-template-rows: [drag-area]30px [thumb]auto [info-side]3fr [music-info]0fr [bottom-controls]0fr 10px;
 
     &.hover {
+        grid-template-columns: [margin-left]20vw [padding-left]0 [player-side]1fr [padding-right]0 [margin-right info-side]20vw;
         grid-template-rows: [drag-area]30px [thumb]auto [info-side]3fr [music-info]1fr [bottom-controls]0fr 10px;
     }
 
     & > div[class*="cover"] {
-        grid-area: 1/1/5/1;
+        grid-area: 1/margin-left/-1/player-side;
         transform: translateX(-25%);
         width: calc(var(--horizontal-layout-max-width)*1.5);
         height: calc(var(--horizontal-layout-max-width)*1.5);
@@ -421,11 +492,11 @@ div[class*="lyricPage"] > div#amll-lyric-player  > div[class*="horizontalLayout"
     
     & > div[class*="thumb"] {
         margin: 0;
-        grid-area: 2/player-side;
+        grid-area: thumb/player-side;
     }
 
     & > div[class*="lyric"] {
-        grid-area: 3/player-side/3;
+        grid-area: info-side/player-side;
         padding-right: 0;
     }
     
@@ -435,7 +506,7 @@ div[class*="lyricPage"] > div#amll-lyric-player  > div[class*="horizontalLayout"
         justify-content: space-around;
         width: 95%;
         margin-top: 0;
-        grid-area: 4/player-side/bottom-controls;
+        grid-area: music-info/padding-left/bottom-controls/margin-right;
     
         & > div {
             order: 1;
@@ -454,13 +525,15 @@ div[class*="lyricPage"] > div#amll-lyric-player  > div[class*="horizontalLayout"
     }
     
     & > div[class*="bottomControls"] {
-        grid-area: 1/info-side/bottom-controls/info-side;
+        grid-area: drag-area/padding-right/bottom-controls/-1;
         flex-direction: column-reverse;
         align-items: flex-end;
         padding: 4em;
     }
-}
-${amllAlignCenter ? `
+}`);
+            }
+            if (amllAlignCenter) {
+                cssContent.push(`
 div.amll-lyric-player.dom:not([class*="hasDuetLine"]) {
     text-align: center;
 
@@ -479,13 +552,15 @@ div.amll-lyric-player.dom:not([class*="hasDuetLine"]) {
         margin-right: 0.25em;
         margin-left: 0.25em;
     }
-}
-` : ''}
-            `
+}`);
+            }
+            styleElement.innerHTML = cssContent.join("\n");
+            consoleLog("INFO", "extend", "歌词模式");
         } else {
-            let styleElement = document.getElementById('lyric_mode');
             if (styleElement) {
                 document.head.removeChild(styleElement);
+            } else {
+                consoleLog("INFO", "extend", "取消歌词模式");
             }
         }
     }, [amllLyricMode, amllAlignCenter]);
@@ -494,7 +569,6 @@ div.amll-lyric-player.dom:not([class*="hasDuetLine"]) {
         let retryTimer = null;
         let isMounted = true;
         let lyricCleanup = null;
-
 
         let timer = null;
         const initLyricEvents = () => {
@@ -554,12 +628,7 @@ div.amll-lyric-player.dom:not([class*="hasDuetLine"]) {
             if (retryTimer) clearTimeout(retryTimer);
             if (typeof lyricCleanup === 'function') lyricCleanup();
         };
-    }, []);
+    }, [amllLyricMode]);
 
     return null;
 }
-
-export const amllFixStyleAtom = atomWithStorage(
-    "amllFixStyleAtom",
-    false
-)

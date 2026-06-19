@@ -3,7 +3,6 @@ import {atomWithStorage} from "jotai/utils";
 import {useEffect, type FC, PropsWithChildren} from "react";
 import chalk from "chalk";
 import {TextProps, Text, Flex, Switch, Card, Separator, TextField, Slider, TextArea} from "@radix-ui/themes";
-import {amllFixStyleAtom} from "./context";
 
 const WARN_TAG = chalk.bgHex("#de2a18").hex("#FFFFFF")(" WARN ");
 const INFO_TAG = chalk.bgHex("#2376b7").hex("#FFFFFF")(" INFO ");
@@ -45,7 +44,6 @@ export const SettingPage: FC = () => {
     const [amllRomanWord, setAmllRomanWord] = useAtom(amllRomanWordAtom)
     const [amllTopRoman, setAmllTopRoman] = useAtom(amllTopRomanAtom)
     const [amllHideRoman, setAmllHideRoman] = useAtom(amllHideRomanAtom)
-    const [amllSwapped, setAmllSwapped] = useAtom(enableLyricSwapTransRomanLineAtom)
     const [amllPartPercent, setAmllPartPercent] = useAtom(amllPartPercentAtom)
     const [amllPlayBar, setAmllPlayBar] = useAtom(amllPlayBarAtom)
     const [amllExtraInfo, setAmllExtraInfo] = useAtom(amllExtraInfoAtom)
@@ -93,7 +91,7 @@ export const SettingPage: FC = () => {
             </Flex>
             <Flex direction="row" align="center" gap="4" my="2">
                 <Flex direction="column" flexGrow="1">
-                    <Text as="div">纯歌词模式</Text>
+                    <Text as="div">沉浸式歌词</Text>
                 </Flex>
                 <Switch checked={amllLyricMode}
                         onCheckedChange={(e) => setAmllLyricMode(e)}/>
@@ -123,7 +121,7 @@ export const SettingPage: FC = () => {
             </Flex>
             <Flex direction="row" align="center" gap="4" my="2">
                 <Flex direction="column" flexGrow="1">
-                    <Text as="div">关闭按钮对齐</Text>
+                    <Text as="div">固定关闭按钮</Text>
                 </Flex>
                 <Switch checked={amllFixControl}
                         onCheckedChange={(e) => setAmllFixControl(e)}/>
@@ -176,42 +174,44 @@ export const SettingPage: FC = () => {
                         onCheckedChange={(e) => setAmllTransCover(e)}/>
             </Flex>
             {amllTransCover ?
-                <Flex direction="row" align="center" gap="4" my="2">
-                    <Flex direction="column" flexGrow="1">
-                        <Text as="div">圆形封面</Text>
+                <>
+                    <Flex direction="row" align="center" gap="4" my="2">
+                        <Flex direction="column" flexGrow="1">
+                            <Text as="div">圆形封面</Text>
+                        </Flex>
+                        <Switch checked={amllCircleCover}
+                                onCheckedChange={(e) => setAmllCircleCover(e)}/>
                     </Flex>
-                    <Switch checked={amllCircleCover}
-                            onCheckedChange={(e) => setAmllCircleCover(e)}/>
-                </Flex>
-                : null}
-            {amllTransCover && amllCircleCover ?
-                <Flex direction="row" align="center" gap="4" my="2">
-                    <Flex direction="column" flexGrow="1">
-                        <Text as="div">旋转封面</Text>
-                    </Flex>
-                    <Switch checked={amllRotaryCover}
-                            onCheckedChange={(e) => setAmllRotaryCover(e)}/>
-                </Flex>
-                : null}
-            {amllTransCover && amllCircleCover ?
-                <Flex direction="row" align="center" gap="4" my="2">
-                    <Flex direction="column" flexGrow="1">
-                        <Text as="div">仿真挖孔</Text>
-                    </Flex>
-                    <Switch checked={amllCenterHole}
-                            onCheckedChange={(e) => setAmllCenterHole(e)}/>
-                </Flex>
-                : null}
-            {amllTransCover && amllCircleCover && amllRotaryCover ?
-                <Flex direction="row" align="center" gap="4" my="2">
-                    <Flex direction="column" flexGrow="1">
-                        <Text as="div">旋转周期</Text>
-                    </Flex>
-                    <TextField.Root type="number" value={amllRotaryCycle}
-                                    onChange={(e) => setAmllRotaryCycle(e.currentTarget.value)}/>
-                    s
-                </Flex>
-                : null}
+                {amllCircleCover ?
+                    <>
+                        <Flex direction="row" align="center" gap="4" my="2">
+                            <Flex direction="column" flexGrow="1">
+                                <Text as="div">仿真挖孔</Text>
+                            </Flex>
+                            <Switch checked={amllCenterHole}
+                                    onCheckedChange={(e) => setAmllCenterHole(e)}/>
+                        </Flex>
+                        <Flex direction="row" align="center" gap="4" my="2">
+                            <Flex direction="column" flexGrow="1">
+                                <Text as="div">旋转封面</Text>
+                            </Flex>
+                            <Switch checked={amllRotaryCover}
+                                onCheckedChange={(e) => setAmllRotaryCover(e)}/>
+                        </Flex>
+                        {amllRotaryCover ?
+                            <Flex direction="row" align="center" gap="4" my="2">
+                                <Flex direction="column" flexGrow="1">
+                                    <Text as="div">旋转周期</Text>
+                                </Flex>
+                                <TextField.Root type="number" value={amllRotaryCycle}
+                                                onChange={(e) => setAmllRotaryCycle(e.currentTarget.value)}/>
+                                s
+                            </Flex>
+                            : null}
+                    </>
+                    : null}
+            </>
+            : null}
         </Card>
         <SubTitle>自定义 CSS</SubTitle>
         <Card mt="2">
@@ -228,6 +228,11 @@ export const amllBgPaddingAtom = atomWithStorage(
 
 export const amllAmbiguousControlAtom = atomWithStorage(
     "amllAmbiguousControlAtom",
+    false
+)
+
+export const amllFixStyleAtom = atomWithStorage(
+    "amllFixStyleAtom",
     false
 )
 
